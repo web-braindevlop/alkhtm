@@ -1,0 +1,103 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m1
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.alkhatm.app
+      vars:
+        BUNDLE_ID: "com.alkhatm.app"
+        APP_STORE_APPLE_ID: YOUR_APPLE_ID # Replace with your Apple ID email
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up key properties
+        script: |
+          echo "Setting up iOS build environment..."
+          
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+          
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+          
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+          
+      - name: Flutter build ipa
+        script: |
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --build-number=$(($(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID") + 1)) \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - YOUR_EMAIL@example.com # Replace with your email
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        # Uncomment below to automatically submit to App Store
+        # submit_to_app_store: true
+        
+  android-workflow:
+    name: Android Workflow
+    max_build_duration: 120
+    instance_type: linux_x2
+    environment:
+      vars:
+        PACKAGE_NAME: "com.alkhatm.app"
+      flutter: stable
+      java: 17
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+          
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+          
+      - name: Build APK
+        script: |
+          flutter build apk --release --build-name=1.0.0 --build-number=$BUILD_NUMBER
+          
+      - name: Build App Bundle
+        script: |
+          flutter build appbundle --release --build-name=1.0.0 --build-number=$BUILD_NUMBER
+    artifacts:
+      - build/app/outputs/**/*.apk
+      - build/app/outputs/**/*.aab
+      - build/**/outputs/**/*.json
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - YOUR_EMAIL@example.com # Replace with your email
+        notify:
+          success: true
+          failure: true
+      # Uncomment below when ready for Google Play
+      # google_play:
+      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+      #   track: internal
+      #   submit_as_draft: true
