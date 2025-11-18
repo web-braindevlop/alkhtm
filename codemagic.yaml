@@ -12,44 +12,26 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Set up key properties
+      - name: Set up iOS Simulator build
         script: |
           echo "Setting up iOS build environment..."
           echo "Building for iOS Simulator (no certificates required)"
-          
-      - name: Set up automatic signing (No certificates required)
-        script: |
-          # Disable code signing for debug builds
-          /usr/libexec/PlistBuddy -c "Set :objects:97C146E61CF9000F007C117D:attributes:TargetAttributes:97C146ED1CF9000F007C117D:DevelopmentTeam ''" ios/Runner.xcodeproj/project.pbxproj || true
           
       - name: Get Flutter packages
         script: |
           flutter packages pub get
           
-      - name: Install pods
+      - name: Install CocoaPods dependencies
         script: |
-          find . -name "Podfile" -execdir pod install \;
-          
-      - name: Flutter analyze
-        script: |
-          flutter analyze
+          cd ios
+          pod install
+          cd ..
           
       - name: Build for iOS Simulator (No Code Signing)
         script: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGN_ENTITLEMENTS="" \
-            clean build
-          cd ..
+          flutter build ios --simulator --debug --no-tree-shake-icons
     artifacts:
-      - ios/build/Release-iphonesimulator/Runner.app
+      - build/ios/iphonesimulator/*.app
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
     publishing:
