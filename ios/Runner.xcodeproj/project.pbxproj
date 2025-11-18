@@ -368,7 +368,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.alkhatm;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alkhatm.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -547,7 +547,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.alkhatm;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alkhatm.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -560,22 +560,22 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = Runner/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.alkhatm;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Release;
+			ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+			CLANG_ENABLE_MODULES = YES;
+			CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+			ENABLE_BITCODE = NO;
+			INFOPLIST_FILE = Runner/Info.plist;
+			LD_RUNPATH_SEARCH_PATHS = (
+				"$(inherited)",
+				"@executable_path/Frameworks",
+			);
+			PRODUCT_BUNDLE_IDENTIFIER = com.alkhatm.app;
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+			SWIFT_VERSION = 5.0;
+			VERSIONING_SYSTEM = "apple-generic";
+		};
+		name = Release;
 		};
 /* End XCBuildConfiguration section */
 
