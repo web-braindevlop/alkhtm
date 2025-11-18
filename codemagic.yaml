@@ -8,6 +8,9 @@ workflows:
         BUNDLE_ID: "com.alkhatm.app"
         XCODE_WORKSPACE: "Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
+        FLUTTER_BUILD_MODE: debug
+        FLUTTER_BUILD_NAME: "1.0.0"
+        FLUTTER_BUILD_NUMBER: "1"
       flutter: stable
       xcode: latest
       cocoapods: default
@@ -20,6 +23,15 @@ workflows:
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+          
+      - name: Generate Flutter iOS files without building
+        script: |
+          flutter pub get
+          flutter assemble \
+            --define=BuildMode=debug \
+            --define=TargetPlatform=ios \
+            --define=DarwinArchiveStore=/ \
+            debug_ios_bundle_flutter_assets || echo "Continuing..."
           
       - name: Install CocoaPods dependencies
         script: |
