@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:html' as html;
-import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -1222,8 +1220,50 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
               borderRadius: BorderRadius.circular(16),
               child: Stack(
                 children: [
-                  // Google Maps iframe
-                  _GoogleMapsIframe(),
+                  // Google Maps placeholder - click to open in browser/app
+                  InkWell(
+                    onTap: () async {
+                      final url = Uri.parse('https://maps.google.com/?q=Al+khatem+gents+tailoring,Ajman');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(16),
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            'https://maps.googleapis.com/maps/api/staticmap?center=25.3848301,55.477339&zoom=15&size=600x400&markers=color:red%7C25.3848301,55.477339&key=YOUR_API_KEY',
+                          ),
+                          fit: BoxFit.cover,
+                          onError: (_, __) {},
+                        ),
+                      ),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.map, color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Open in Google Maps',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   // Info card overlay matching website design
                   Positioned(
                     top: 16,
@@ -1873,36 +1913,4 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 }
 
-// Google Maps iframe widget for web
-class _GoogleMapsIframe extends StatefulWidget {
-  @override
-  State<_GoogleMapsIframe> createState() => _GoogleMapsIframeState();
-}
 
-class _GoogleMapsIframeState extends State<_GoogleMapsIframe> {
-  final String viewType = 'google-maps-iframe';
-  
-  @override
-  void initState() {
-    super.initState();
-    // Register view factory once
-    // ignore: undefined_prefixed_name
-    ui_web.platformViewRegistry.registerViewFactory(
-      viewType,
-      (int viewId) {
-        final iframe = html.IFrameElement()
-          ..src = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3604.596685777196!2d55.477339300000004!3d25.3848301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f59316123dccd%3A0xe0bed67a2d51efd!2sAl%20khatem%20gents%20tailoring!5e0!3m2!1sen!2sae!4v1722532842457!5m2!1sen!2sae'
-          ..style.border = 'none'
-          ..style.height = '100%'
-          ..style.width = '100%'
-          ..allowFullscreen = true;
-        return iframe;
-      },
-    );
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    return HtmlElementView(viewType: viewType);
-  }
-}
