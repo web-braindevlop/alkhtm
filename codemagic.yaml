@@ -34,11 +34,22 @@ workflows:
         script: |
           flutter analyze
           
-      - name: Flutter build iOS (Simulator)
+      - name: Build for iOS Simulator (No Code Signing)
         script: |
-          flutter build ios --simulator --debug
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            clean build
+          cd ..
     artifacts:
-      - build/ios/iphonesimulator/Runner.app
+      - ios/build/Release-iphonesimulator/Runner.app
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
     publishing:
