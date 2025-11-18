@@ -1,9 +1,14 @@
 workflows:
   ios-workflow:
-    name: iOS Workflow
+    name: iOS Workflow (Requires Apple Developer Account)
     max_build_duration: 120
     instance_type: mac_mini_m1
+    integrations:
+      app_store_connect: codemagic
     environment:
+      ios_signing:
+        distribution_type: development
+        bundle_identifier: com.alkhatm.app
       vars:
         BUNDLE_ID: "com.alkhatm.app"
         XCODE_WORKSPACE: "Runner.xcworkspace"
@@ -15,52 +20,28 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Set up iOS Simulator build
+      - name: Set up iOS build
         script: |
-          echo "Setting up iOS build environment..."
-          echo "Building for iOS Simulator (no certificates required)"
+          echo "Building iOS app with proper code signing"
           
       - name: Get Flutter packages
         script: |
-          flutter packages pub get
-          
-      - name: Generate Flutter iOS files without building
-        script: |
           flutter pub get
-          flutter assemble \
-            --define=BuildMode=debug \
-            --define=TargetPlatform=ios \
-            --define=DarwinArchiveStore=/ \
-            debug_ios_bundle_flutter_assets || echo "Continuing..."
           
-      - name: Install CocoaPods dependencies
+      - name: Install CocoaPods
         script: |
           cd ios
           pod install
           cd ..
           
-      - name: Build for iOS Simulator with xcodebuild directly
+      - name: Build iOS IPA
         script: |
-          cd ios
-          xcodebuild clean \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Debug \
-            -sdk iphonesimulator
-            
-          xcodebuild build \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            DEVELOPMENT_TEAM=""
-          cd ..
+          flutter build ipa --release \
+            --export-options-plist=ios/ExportOptions.plist \
+            --build-name=1.0.0 \
+            --build-number=1
     artifacts:
-      - ios/build/Debug-iphonesimulator/Runner.app
+      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
     publishing:
@@ -70,6 +51,10 @@ workflows:
         notify:
           success: true
           failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false
         
   android-workflow:
     name: Android Workflow
