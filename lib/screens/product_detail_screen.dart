@@ -534,7 +534,7 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
     setState(() => _isLoadingReviews = true);
 
     try {
-      final url = 'https://alkhatm.com/wordpress/wp-api-bridge.php?action=product_reviews&id=${widget.productId}&per_page=20';
+      final url = 'https://alkhatm.com/wp-api-bridge.php?action=product_reviews&id=${widget.productId}&per_page=20';
       
       final response = await http.get(Uri.parse(url));
 
@@ -579,7 +579,7 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://alkhatm.com/wordpress/wp-api-bridge.php?action=submit_review'),
+        Uri.parse('https://alkhatm.com/wp-api-bridge.php?action=submit_review'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'product_id': widget.productId,

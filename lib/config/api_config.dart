@@ -1,10 +1,10 @@
 class ApiConfig {
   // WordPress API Base URLs
-  static const String baseUrl = 'https://alkhatm.com/wordpress';
+  static const String baseUrl = 'https://alkhatm.com';
   static const String apiUrl = '$baseUrl/wp-api-bridge.php';
   
   // WooCommerce API
-  static const String wooCommerceUrl = '$baseUrl/wp-json/wc/v3';
+  static const String wooCommerceUrl = 'https://alkhatm.com/wp-json/wc/v3';
   static const String consumerKey = 'ck_f8654c6fd750b2b85e9b4afe97d6bd536b104377';
   static const String consumerSecret = 'cs_f4b0460ef63f0ea5a3e44a51edb1ce90c18a524f';
   

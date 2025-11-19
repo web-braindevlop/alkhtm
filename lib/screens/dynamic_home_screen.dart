@@ -215,7 +215,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
               children: [
                 Flexible(
                   child: CachedNetworkImage(
-                    imageUrl: 'https://alkhatm.com/wordpress/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
+                    imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
                     height: leftLogoHeight,
                     fit: BoxFit.contain,
                     placeholder: (context, url) => SizedBox(
@@ -234,7 +234,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                 const SizedBox(width: 0),
                 Flexible(
                   child: CachedNetworkImage(
-                    imageUrl: 'https://alkhatm.com/wordpress/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png',
+                    imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png',
                     height: rightLogoHeight,
                     fit: BoxFit.contain,
                     placeholder: (context, url) => SizedBox(
@@ -278,7 +278,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CachedNetworkImage(
-                  imageUrl: 'https://alkhatm.com/wordpress/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
+                  imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
                   height: 40,
                   fit: BoxFit.contain,
                   placeholder: (context, url) => const SizedBox(
@@ -295,7 +295,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                 ),
                 const SizedBox(height: 8),
                 CachedNetworkImage(
-                  imageUrl: 'https://alkhatm.com/wordpress/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png',
+                  imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png',
                   height: 40,
                   fit: BoxFit.contain,
                   placeholder: (context, url) => const SizedBox(
@@ -577,15 +577,15 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     final List<Map<String, String>> countryFlags = [
       {
         'name': 'Emirates',
-        'image': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/05/EMARATI.png',
+        'image': 'https://alkhatm.com/wp-content/uploads/2024/05/EMARATI.png',
       },
       {
         'name': 'Kuwait',
-        'image': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/05/KUWAITI.png',
+        'image': 'https://alkhatm.com/wp-content/uploads/2024/05/KUWAITI.png',
       },
       {
         'name': 'Saudi Arabia',
-        'image': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/05/SAUDI-ARABIA.png',
+        'image': 'https://alkhatm.com/wp-content/uploads/2024/05/SAUDI-ARABIA.png',
       },
     ];
 
@@ -651,7 +651,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     
     // Manual mapping for category images (since WooCommerce categories don't have images)
     String? _getCategoryImage(String categoryName) {
-      final baseUrl = 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08';
+      final baseUrl = 'https://alkhatm.com/wp-content/uploads/2024/08';
       final categoryImages = {
         'SANDALS': '$baseUrl/SANDALS-CAT.png',
         'FRAGRANCES': '$baseUrl/FRAGRANCES-CAT.png',
@@ -1036,39 +1036,39 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   Widget _buildProductShowcaseSection() {
     final List<Map<String, String>> showcaseImages = [
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/SHAWL-CAT-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/SHAWL-CAT-150x150.png',
         'alt': 'SHAWL - CAT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/SANDALS-CAT-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/SANDALS-CAT-150x150.png',
         'alt': 'SANDALS - CAT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/HUZAR-CAT-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/HUZAR-CAT-150x150.png',
         'alt': 'HUZAR - CAT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/FRAGRANCES-CAT-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/FRAGRANCES-CAT-150x150.png',
         'alt': 'FRAGRANCES - CAT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/BUKHOOR-CAT-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/BUKHOOR-CAT-150x150.png',
         'alt': 'BUKHOOR - CAT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/AGAL-CAT-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/AGAL-CAT-150x150.png',
         'alt': 'AGAL - CAT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/2338-WTTN-1-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/2338-WTTN-1-150x150.png',
         'alt': 'SANDAL PRODUCT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/2230-BKTN-4-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/2230-BKTN-4-150x150.png',
         'alt': 'SANDAL PRODUCT'
       },
       {
-        'url': 'https://alkhatm.com/wordpress/wp-content/uploads/2024/08/SH02-3-150x150.png',
+        'url': 'https://alkhatm.com/wp-content/uploads/2024/08/SH02-3-150x150.png',
         'alt': 'SHAWL PRODUCT'
       },
     ];
@@ -1513,7 +1513,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
           if (showLogo)
             Center(
               child: CachedNetworkImage(
-                imageUrl: 'https://alkhatm.com/wordpress/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
+                imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
                 height: 60,
                 fit: BoxFit.contain,
                 placeholder: (context, url) => const SizedBox(
