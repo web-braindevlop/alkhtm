@@ -231,4 +231,21 @@ class AuthService {
     await prefs.remove(_tokenKey);
     await prefs.remove(_userDataKey);
   }
+
+  // Request password reset
+  Future<bool> requestPasswordReset(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.buildUrl('reset_password_request')),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      ).timeout(ApiConfig.timeout);
+
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200 && data['success'] == true;
+    } catch (e) {
+      print('Password reset request error: $e');
+      return false;
+    }
+  }
 }

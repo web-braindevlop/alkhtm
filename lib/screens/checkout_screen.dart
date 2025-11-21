@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../services/woocommerce_service.dart';
+import '../services/auth_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -19,6 +20,7 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _authService = AuthService();
   
   // Billing Details Controllers
   final _firstNameController = TextEditingController();
@@ -36,6 +38,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   
   String _selectedPaymentMethod = 'cod'; // Cash on Delivery as default
   bool _isProcessing = false;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+  
+  Future<void> _loadUserData() async {
+    final isLoggedIn = await _authService.isLoggedIn();
+    if (isLoggedIn) {
+      final userData = await _authService.fetchUserInfo();
+      if (userData != null && mounted) {
+        setState(() {
+          _isLoggedIn = true;
+          // Pre-fill user data
+          _firstNameController.text = userData['first_name'] ?? '';
+          _lastNameController.text = userData['last_name'] ?? '';
+          _emailController.text = userData['email'] ?? '';
+          _phoneController.text = userData['phone'] ?? '';
+          
+          // Pre-fill billing address if available
+          final billing = userData['billing_address'];
+          if (billing != null) {
+            _companyController.text = billing['company'] ?? '';
+            _address1Controller.text = billing['address_1'] ?? '';
+            _address2Controller.text = billing['address_2'] ?? '';
+            _cityController.text = billing['city'] ?? '';
+            _stateController.text = billing['state'] ?? '';
+            _postcodeController.text = billing['postcode'] ?? '';
+          }
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {

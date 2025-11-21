@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import '../services/wordpress_service.dart';
 import '../services/woocommerce_service.dart';
+import '../services/auth_service.dart';
 import '../models/wordpress_models.dart';
 import '../widgets/content_widgets.dart';
 import '../config/api_config.dart';
@@ -16,6 +17,8 @@ import 'category_products_screen.dart';
 import 'featured_products_screen.dart';
 import 'sale_products_screen.dart';
 import 'notification_settings_screen.dart';
+import 'login_screen.dart';
+import 'order_history_screen.dart';
 
 class DynamicHomeScreen extends StatefulWidget {
   const DynamicHomeScreen({super.key});
@@ -48,6 +51,11 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   // Sidebar menu state
   bool _isPoliciesExpanded = false;
   
+  // User authentication
+  final AuthService _authService = AuthService();
+  bool _isLoggedIn = false;
+  Map<String, dynamic>? _userData;
+  
   // Social media links
   Map<String, String> _socialLinks = {};
   
@@ -63,6 +71,34 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     _footerPageController = PageController();
     _startShowcaseAutoplay();
     _loadHomePageContent();
+    _checkLoginStatus();
+  }
+  
+  Future<void> _checkLoginStatus() async {
+    final isLoggedIn = await _authService.isLoggedIn();
+    if (isLoggedIn) {
+      final userData = await _authService.getUserData();
+      setState(() {
+        _isLoggedIn = true;
+        _userData = userData;
+      });
+    }
+  }
+  
+  Future<void> _logout() async {
+    await _authService.logout();
+    setState(() {
+      _isLoggedIn = false;
+      _userData = null;
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged out successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
   @override
@@ -317,6 +353,98 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
               ],
             ),
           ),
+          
+          // User Profile Section
+          if (_isLoggedIn && _userData != null) ...[
+            Container(
+              color: Colors.blue[50],
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: const Color(0xFF79B2D5),
+                        child: Text(
+                          (_userData!['first_name'] ?? 'U')[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_userData!['first_name']} ${_userData!['last_name']}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              _userData!['email'] ?? '',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.shopping_bag, color: Color(0xFF79B2D5)),
+              title: const Text('My Orders'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OrderHistoryScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+                _logout();
+              },
+            ),
+            const Divider(),
+          ] else ...[
+            ListTile(
+              leading: const Icon(Icons.login, color: Color(0xFF79B2D5)),
+              title: const Text('Login / Register'),
+              subtitle: const Text('Access your orders and profile'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginScreen(),
+                  ),
+                ).then((loggedIn) {
+                  if (loggedIn == true) {
+                    _checkLoginStatus();
+                  }
+                });
+              },
+            ),
+            const Divider(),
+          ],
+          
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text('Home'),
