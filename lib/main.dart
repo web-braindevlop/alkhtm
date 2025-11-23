@@ -13,12 +13,9 @@ void main() async {
     // Initialize APNs only for iOS (not web)
     if (!kIsWeb) {
       await APNsService.initialize();
-      print('✅ APNs initialized for iOS');
-    } else {
-      print('ℹ️ Running on web - APNs not available');
     }
   } catch (e) {
-    print('APNs initialization error: $e');
+    // APNs initialization error
   }
   
   runApp(const MyApp());

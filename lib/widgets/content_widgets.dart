@@ -344,8 +344,8 @@ class HeroSection extends StatelessWidget {
                     ),
                   ),
                   errorWidget: (context, url, error) {
-                    print('Image load error: $error for URL: $url');
-                    return Center(
+                    // Image load error
+                    return Container(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

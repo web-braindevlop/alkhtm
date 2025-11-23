@@ -105,8 +105,8 @@ class _PageDetailScreenState extends State<PageDetailScreen> {
   }
 
   String _extractAddress(String content) {
-    final addressMatch = RegExp(r'Al Khatem[^<]*?UAE', caseSensitive: false).firstMatch(content);
-    return addressMatch?.group(0) ?? 'Al Khatem Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
+    final addressMatch = RegExp(r'Al Khatm[^<]*?UAE', caseSensitive: false).firstMatch(content);
+    return addressMatch?.group(0) ?? 'Al Khatm Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
   }
 
   Map<String, String> _extractSocialLinks(String content) {
@@ -296,7 +296,7 @@ class _PageDetailScreenState extends State<PageDetailScreen> {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'AL KHATEM GROUP OF COMPANIES',
+                          'AL KHATM GROUP OF COMPANIES',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

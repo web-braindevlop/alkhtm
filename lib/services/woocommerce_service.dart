@@ -360,16 +360,10 @@ class WooCommerceService {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
           return jsonResponse['data'];
-        } else {
-          print('Order creation failed: ${jsonResponse['message']}');
         }
-      } else {
-        print('Order creation HTTP error: ${response.statusCode}');
-        print('Response body: ${response.body}');
       }
       return null;
     } catch (e) {
-      print('Order creation exception: $e');
       return null;
     }
   }

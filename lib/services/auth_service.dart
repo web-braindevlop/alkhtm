@@ -37,7 +37,6 @@ class AuthService {
       
       return null;
     } catch (e) {
-      print('Registration error: $e');
       return null;
     }
   }
@@ -69,12 +68,14 @@ class AuthService {
           userData: userData,
         );
         
+        // Merge guest cart if exists
+        await _mergeGuestCart();
+        
         return userData;
       }
       
       return null;
     } catch (e) {
-      print('Login error: $e');
       return null;
     }
   }
@@ -148,7 +149,6 @@ class AuthService {
       
       return null;
     } catch (e) {
-      print('Fetch user info error: $e');
       return null;
     }
   }
@@ -178,7 +178,6 @@ class AuthService {
       
       return null;
     } catch (e) {
-      print('Get user orders error: $e');
       return null;
     }
   }
@@ -194,32 +193,38 @@ class AuthService {
       final userId = await getUserId();
       final token = await getToken();
       
-      if (userId == null || token == null) return false;
+      if (userId == null || token == null) {
+        return false;
+      }
+
+      final requestBody = {
+        'user_id': userId,
+        'token': token,
+        if (firstName != null) 'first_name': firstName,
+        if (lastName != null) 'last_name': lastName,
+        if (phone != null) 'phone': phone,
+        if (billing != null) 'billing': billing,
+      };
 
       final response = await http.post(
         Uri.parse(ApiConfig.buildUrl('update_user_profile')),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_id': userId,
-          'token': token,
-          if (firstName != null) 'first_name': firstName,
-          if (lastName != null) 'last_name': lastName,
-          if (phone != null) 'phone': phone,
-          if (billing != null) 'billing': billing,
-        }),
+        body: jsonEncode(requestBody),
       ).timeout(ApiConfig.timeout);
 
       final data = jsonDecode(response.body);
       
       if (response.statusCode == 200 && data['success'] == true) {
-        // Refresh user data
-        await fetchUserInfo();
+        // Save updated user data directly from response
+        if (data['data'] != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_userDataKey, jsonEncode(data['data']));
+        }
         return true;
       }
       
       return false;
     } catch (e) {
-      print('Update profile error: $e');
       return false;
     }
   }
@@ -230,6 +235,21 @@ class AuthService {
     await prefs.remove(_userIdKey);
     await prefs.remove(_tokenKey);
     await prefs.remove(_userDataKey);
+  }
+
+  // Merge guest cart with user cart (preserves cart on login/register)
+  Future<void> _mergeGuestCart() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cartJson = prefs.getString('cart');
+      
+      if (cartJson != null && cartJson != '[]') {
+        // Guest cart exists and is preserved automatically
+        // SharedPreferences 'cart' key is used for both guest and logged-in users
+      }
+    } catch (e) {
+      // Silently handle any cart merge errors
+    }
   }
 
   // Request password reset
@@ -244,7 +264,6 @@ class AuthService {
       final data = jsonDecode(response.body);
       return response.statusCode == 200 && data['success'] == true;
     } catch (e) {
-      print('Password reset request error: $e');
       return false;
     }
   }

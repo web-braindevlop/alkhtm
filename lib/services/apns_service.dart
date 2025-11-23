@@ -13,10 +13,8 @@ class APNsService {
     try {
       // Set up method call handler for receiving messages from native iOS
       platform.setMethodCallHandler(_handleMethod);
-      
-      print('✅ APNs Service initialized');
     } catch (e) {
-      print('❌ Failed to initialize APNs: $e');
+      // Failed to initialize APNs
     }
   }
   
@@ -32,13 +30,12 @@ class APNsService {
         _handleNotificationTapped(data);
         break;
       default:
-        print('Unknown method: ${call.method}');
+        // Unknown method
     }
   }
   
   /// Handle device token received from APNs
   static Future<void> _handleTokenReceived(String token) async {
-    print('📱 APNs Device Token received: $token');
     _deviceToken = token;
     
     // Save token locally
@@ -51,16 +48,13 @@ class APNsService {
   
   /// Handle notification tap
   static void _handleNotificationTapped(Map<dynamic, dynamic> data) {
-    print('👆 Notification tapped with data: $data');
-    
     // Handle navigation based on notification data
     // You can use a navigator key or event bus to navigate
     
     // Example: Check if notification contains order_id
     if (data.containsKey('order_id')) {
       final orderId = data['order_id'];
-      print('Navigate to order: $orderId');
-      // TODO: Navigate to order details screen
+      // Navigate to order details screen
     }
   }
   
@@ -71,7 +65,7 @@ class APNsService {
       final userId = prefs.getInt('user_id');
       
       if (userId == null) {
-        print('⚠️ User not logged in, token will be sent after login');
+        // User not logged in, token will be sent after login
         return;
       }
       
@@ -85,18 +79,16 @@ class APNsService {
           'platform': 'ios',
         }),
       );
-      
+
       if (response.statusCode == 200) {
-        print('✅ Device token registered with backend');
+        // Device token registered with backend
       } else {
-        print('❌ Failed to register token: ${response.statusCode}');
+        // Failed to register token
       }
     } catch (e) {
-      print('❌ Error sending token to backend: $e');
+      // Error sending token to backend
     }
-  }
-  
-  /// Get the current device token
+  }  /// Get the current device token
   static Future<String?> getDeviceToken() async {
     if (_deviceToken != null) return _deviceToken;
     
@@ -112,7 +104,7 @@ class APNsService {
       // This method is here for consistency
       return true;
     } catch (e) {
-      print('❌ Error requesting permissions: $e');
+      // Error requesting permissions
       return false;
     }
   }

@@ -3,9 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'checkout_screen.dart';
+import '../widgets/app_drawer.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({super.key});
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  
+  const CartScreen({super.key, this.scaffoldKey});
 
   @override
   State<CartScreen> createState() => CartScreenState();
@@ -76,6 +79,7 @@ class CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: widget.scaffoldKey,
       appBar: AppBar(
         title: const Text('Cart'),
         actions: [
@@ -109,6 +113,7 @@ class CartScreenState extends State<CartScreen> {
             ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _cartItems.isEmpty

@@ -5,6 +5,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/woocommerce_service.dart';
+import '../services/auth_service.dart';
 import '../widgets/content_widgets.dart';
 import '../main.dart';
 
@@ -61,7 +62,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         _isLoadingRelated = false;
       });
     } catch (e) {
-      print('Error loading related products: $e');
       if (!mounted) return;
       setState(() => _isLoadingRelated = false);
     }
@@ -416,9 +416,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             action: SnackBarAction(
                               label: 'View Cart',
                               onPressed: () {
-                                // Navigate back to main screen
-                                Navigator.of(context).popUntil((route) => route.isFirst);
-                                // Switch to cart tab (index 2) using global key
+                                // Pop current screen and switch to cart tab
+                                Navigator.of(context).pop();
                                 mainScreenKey.currentState?.switchToTab(2);
                               },
                             ),
@@ -441,9 +440,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ? () async {
                     await _addToCart();
                     if (mounted) {
-                      // Navigate back to main screen
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                      // Switch to checkout directly
+                      // Pop current screen and switch to checkout
+                      Navigator.of(context).pop();
                       mainScreenKey.currentState?.switchToTab(2);
                       // Navigate to checkout after a small delay
                       Future.delayed(const Duration(milliseconds: 300), () {
@@ -505,6 +503,7 @@ class _ReviewsSection extends StatefulWidget {
 }
 
 class _ReviewsSectionState extends State<_ReviewsSection> {
+  final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
   final _reviewController = TextEditingController();
   final _nameController = TextEditingController();
@@ -515,11 +514,32 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
   bool _isLoadingReviews = true;
   double _averageRating = 0;
   int _ratingCount = 0;
+  bool _isLoggedIn = false;
+  Map<String, dynamic>? _userData;
 
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
     _loadReviews();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final isLoggedIn = await _authService.isLoggedIn();
+    if (isLoggedIn) {
+      final userData = await _authService.getUserData();
+      if (mounted) {
+        setState(() {
+          _isLoggedIn = true;
+          _userData = userData;
+          // Pre-fill name and email for logged-in users
+          if (userData != null) {
+            _nameController.text = '${userData['first_name'] ?? ''} ${userData['last_name'] ?? ''}'.trim();
+            _emailController.text = userData['email'] ?? '';
+          }
+        });
+      }
+    }
   }
 
   @override
@@ -557,7 +577,6 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
         setState(() => _isLoadingReviews = false);
       }
     } catch (e) {
-      print('Error loading reviews: $e');
       setState(() => _isLoadingReviews = false);
     }
   }
@@ -586,7 +605,9 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
           'rating': _rating,
           'review': _reviewController.text,
           'name': _nameController.text,
-          'email': _emailController.text,
+          'email': _isLoggedIn && _userData != null 
+              ? _userData!['email'] 
+              : _emailController.text,
         }),
       );
 
@@ -801,38 +822,40 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
             ),
             const SizedBox(height: 20),
             
-            // Email Field
-            const Text(
-              'Your Email *',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                hintText: 'Enter your email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+            // Email Field - Only show for non-logged-in users
+            if (!_isLoggedIn) ...[
+              const Text(
+                'Your Email *',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                prefixIcon: const Icon(Icons.email),
               ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: 'Enter your email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  prefixIcon: const Icon(Icons.email),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
             
             // Submit Button
             SizedBox(
@@ -957,11 +980,14 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            review.reviewerName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                          Flexible(
+                            child: Text(
+                              review.reviewerName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (review.verified) ...[
@@ -977,7 +1003,7 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
                                 border: Border.all(color: Colors.green),
                               ),
                               child: const Text(
-                                'Verified Purchase',
+                                'Verified',
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: Colors.green,

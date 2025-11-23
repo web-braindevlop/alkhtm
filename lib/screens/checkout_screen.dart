@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../services/woocommerce_service.dart';
@@ -47,27 +48,118 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
   
   Future<void> _loadUserData() async {
+    print('🔍 CHECKOUT: Starting _loadUserData...');
     final isLoggedIn = await _authService.isLoggedIn();
+    print('🔍 CHECKOUT: isLoggedIn = $isLoggedIn');
+    
     if (isLoggedIn) {
+      // Try to get last order data first for better pre-fill
+      print('🔍 CHECKOUT: Fetching user orders...');
+      final ordersData = await _authService.getUserOrders(page: 1, perPage: 1);
+      print('🔍 CHECKOUT: ordersData = $ordersData');
+      
+      print('🔍 CHECKOUT: Fetching user info...');
       final userData = await _authService.fetchUserInfo();
-      if (userData != null && mounted) {
+      print('🔍 CHECKOUT: userData = $userData');
+      
+      if (mounted) {
         setState(() {
           _isLoggedIn = true;
-          // Pre-fill user data
-          _firstNameController.text = userData['first_name'] ?? '';
-          _lastNameController.text = userData['last_name'] ?? '';
-          _emailController.text = userData['email'] ?? '';
-          _phoneController.text = userData['phone'] ?? '';
           
-          // Pre-fill billing address if available
-          final billing = userData['billing_address'];
-          if (billing != null) {
-            _companyController.text = billing['company'] ?? '';
-            _address1Controller.text = billing['address_1'] ?? '';
-            _address2Controller.text = billing['address_2'] ?? '';
-            _cityController.text = billing['city'] ?? '';
-            _stateController.text = billing['state'] ?? '';
-            _postcodeController.text = billing['postcode'] ?? '';
+          // Pre-fill from user data
+          _firstNameController.text = userData?['first_name'] ?? '';
+          _lastNameController.text = userData?['last_name'] ?? '';
+          _emailController.text = userData?['email'] ?? '';
+          _phoneController.text = userData?['phone'] ?? '';
+          
+          print('🔍 CHECKOUT: Basic info filled - Name: ${_firstNameController.text} ${_lastNameController.text}, Phone: ${_phoneController.text}, Email: ${_emailController.text}');
+          
+          // If user has previous orders, use billing from last order
+          if (ordersData != null && ordersData['orders'] != null) {
+            print('🔍 CHECKOUT: ordersData is not null, checking orders...');
+            final orders = ordersData['orders'] as List;
+            print('🔍 CHECKOUT: Number of orders: ${orders.length}');
+            
+            if (orders.isNotEmpty) {
+              final lastOrder = orders[0];
+              print('🔍 CHECKOUT: Last order data: $lastOrder');
+              
+              final billing = lastOrder['billing'];
+              print('🔍 CHECKOUT: Billing data from last order: $billing');
+              
+              if (billing != null) {
+                // Fill from last order, but only if fields are not empty
+                _firstNameController.text = (billing['first_name']?.toString().trim().isNotEmpty ?? false) 
+                    ? billing['first_name'] 
+                    : _firstNameController.text;
+                _lastNameController.text = (billing['last_name']?.toString().trim().isNotEmpty ?? false) 
+                    ? billing['last_name'] 
+                    : _lastNameController.text;
+                _companyController.text = billing['company']?.toString().trim() ?? '';
+                _address1Controller.text = billing['address_1']?.toString().trim() ?? '';
+                _address2Controller.text = billing['address_2']?.toString().trim() ?? '';
+                _cityController.text = billing['city']?.toString().trim() ?? '';
+                _stateController.text = billing['state']?.toString().trim() ?? '';
+                _postcodeController.text = billing['postcode']?.toString().trim() ?? '';
+                _phoneController.text = (billing['phone']?.toString().trim().isNotEmpty ?? false) 
+                    ? billing['phone'] 
+                    : _phoneController.text;
+                _emailController.text = (billing['email']?.toString().trim().isNotEmpty ?? false) 
+                    ? billing['email'] 
+                    : _emailController.text;
+                
+                print('✅ CHECKOUT: Billing fields filled from last order:');
+                print('   Company: ${_companyController.text}');
+                print('   Address 1: ${_address1Controller.text}');
+                print('   Address 2: ${_address2Controller.text}');
+                print('   City: ${_cityController.text}');
+                print('   State: ${_stateController.text}');
+                print('   Postcode: ${_postcodeController.text}');
+              } else {
+                print('⚠️ CHECKOUT: Billing data is NULL in last order');
+              }
+            } else {
+              print('⚠️ CHECKOUT: Orders list is EMPTY');
+            }
+          } else {
+            print('⚠️ CHECKOUT: ordersData is NULL or orders key is missing');
+          }
+          
+          // Always check user profile for missing fields (fallback/supplement)
+          print('🔍 CHECKOUT: Checking user profile for any missing billing data...');
+          final profileBilling = userData?['billing'];
+          print('🔍 CHECKOUT: User profile billing: $profileBilling');
+          
+          if (profileBilling != null) {
+            // Fill empty fields from profile
+            if (_companyController.text.isEmpty && profileBilling['company'] != null) {
+              _companyController.text = profileBilling['company']?.toString().trim() ?? '';
+            }
+            if (_address1Controller.text.isEmpty && profileBilling['address_1'] != null) {
+              _address1Controller.text = profileBilling['address_1']?.toString().trim() ?? '';
+            }
+            if (_address2Controller.text.isEmpty && profileBilling['address_2'] != null) {
+              _address2Controller.text = profileBilling['address_2']?.toString().trim() ?? '';
+            }
+            if (_cityController.text.isEmpty && profileBilling['city'] != null) {
+              _cityController.text = profileBilling['city']?.toString().trim() ?? '';
+            }
+            if (_stateController.text.isEmpty && profileBilling['state'] != null) {
+              _stateController.text = profileBilling['state']?.toString().trim() ?? '';
+            }
+            if (_postcodeController.text.isEmpty && profileBilling['postcode'] != null) {
+              _postcodeController.text = profileBilling['postcode']?.toString().trim() ?? '';
+            }
+            
+            print('✅ CHECKOUT: Final billing fields (supplemented from profile):');
+            print('   Company: ${_companyController.text}');
+            print('   Address 1: ${_address1Controller.text}');
+            print('   Address 2: ${_address2Controller.text}');
+            print('   City: ${_cityController.text}');
+            print('   State: ${_stateController.text}');
+            print('   Postcode: ${_postcodeController.text}');
+          } else {
+            print('⚠️ CHECKOUT: No billing data in user profile');
           }
         });
       }
@@ -92,7 +184,49 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _placeOrder() async {
-    if (!_formKey.currentState!.validate()) {
+    // Force unfocus to trigger validation
+    FocusScope.of(context).unfocus();
+    
+    // Additional manual validation for critical fields
+    if (_firstNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('First name is required'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    if (_lastNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Last name is required'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Check if form is valid
+    final isValid = _formKey.currentState?.validate() ?? false;
+    
+    if (!isValid) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all required fields marked with *'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      
+      // Scroll to top to show first error
+      Scrollable.ensureVisible(
+        _formKey.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
       return;
     }
 
@@ -231,6 +365,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
       body: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -241,14 +376,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             _buildTextField(
               controller: _firstNameController,
               label: 'First Name *',
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'First name is required';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             
             _buildTextField(
               controller: _lastNameController,
               label: 'Last Name *',
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Last name is required';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             
@@ -269,7 +414,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               controller: _address1Controller,
               label: 'Street Address *',
               hint: 'House number and street name',
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Street address is required';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             
@@ -282,7 +432,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             _buildTextField(
               controller: _cityController,
               label: 'Town / City *',
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'City is required';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             
@@ -302,7 +457,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               controller: _phoneController,
               label: 'Phone *',
               keyboardType: TextInputType.phone,
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
+              ],
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Phone number is required';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             
@@ -311,8 +474,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               label: 'Email Address *',
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
-                if (value?.isEmpty ?? true) return 'Required';
-                if (!value!.contains('@')) return 'Invalid email';
+                if (value == null || value.trim().isEmpty) {
+                  return 'Email address is required';
+                }
+                if (!value.trim().contains('@') || !value.trim().contains('.')) {
+                  return 'Please enter a valid email address';
+                }
                 return null;
               },
             ),
@@ -405,6 +572,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     TextInputType? keyboardType,
     int maxLines = 1,
     bool enabled = true,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
@@ -422,6 +590,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFF79B2D5), width: 2),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
         filled: !enabled,
         fillColor: enabled ? null : Colors.grey[100],
       ),
@@ -429,6 +605,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       keyboardType: keyboardType,
       maxLines: maxLines,
       enabled: enabled,
+      inputFormatters: inputFormatters,
     );
   }
 

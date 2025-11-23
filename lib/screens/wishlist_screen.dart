@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import '../widgets/app_drawer.dart';
 
-class WishlistScreen extends StatelessWidget {
-  const WishlistScreen({super.key});
+class WishlistScreen extends StatefulWidget {
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  
+  const WishlistScreen({super.key, this.scaffoldKey});
 
+  @override
+  State<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends State<WishlistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: widget.scaffoldKey,
       appBar: AppBar(
         title: const Text('Wishlist'),
       ),
+      drawer: const AppDrawer(),
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

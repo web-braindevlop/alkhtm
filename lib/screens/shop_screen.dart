@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/app_drawer.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../services/woocommerce_service.dart';
 import '../widgets/content_widgets.dart';
 import 'product_detail_screen.dart';
 
 class ShopScreen extends StatefulWidget {
-  const ShopScreen({super.key});
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  
+  const ShopScreen({super.key, this.scaffoldKey});
 
   @override
   State<ShopScreen> createState() => _ShopScreenState();
@@ -47,6 +50,7 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: widget.scaffoldKey,
       appBar: AppBar(
         title: const Text('Shop'),
         actions: [
@@ -58,6 +62,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: _buildBody(),
     );
   }

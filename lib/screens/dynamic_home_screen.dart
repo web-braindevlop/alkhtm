@@ -10,6 +10,7 @@ import '../services/woocommerce_service.dart';
 import '../services/auth_service.dart';
 import '../models/wordpress_models.dart';
 import '../widgets/content_widgets.dart';
+import '../widgets/app_drawer.dart';
 import '../config/api_config.dart';
 import 'page_detail_screen.dart';
 import 'product_detail_screen.dart';
@@ -21,13 +22,16 @@ import 'login_screen.dart';
 import 'order_history_screen.dart';
 
 class DynamicHomeScreen extends StatefulWidget {
-  const DynamicHomeScreen({super.key});
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  
+  const DynamicHomeScreen({super.key, this.scaffoldKey});
 
   @override
   State<DynamicHomeScreen> createState() => _DynamicHomeScreenState();
 }
 
 class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
+  GlobalKey<ScaffoldState>? _scaffoldKey;
   final WordPressService _wpService = WordPressService();
   final WooCommerceService _wooService = WooCommerceService();
 
@@ -135,8 +139,8 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 
   String _extractAddress(String content) {
-    final addressMatch = RegExp(r'Al Khatem[^<]*?UAE', caseSensitive: false).firstMatch(content);
-    return addressMatch?.group(0) ?? 'Al Khatem Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
+    final addressMatch = RegExp(r'Al Khatm[^<]*?UAE', caseSensitive: false).firstMatch(content);
+    return addressMatch?.group(0) ?? 'Al Khatm Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
   }
 
   Map<String, String> _extractSocialLinks(String content) {
@@ -202,7 +206,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         _socialLinks = {};
         _contactPhone = '+971566810269';
         _contactEmail = 'info@alkhatm.com';
-        _contactAddress = 'Al Khatem Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
+        _contactAddress = 'Al Khatm Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
       }
 
       setState(() {
@@ -238,6 +242,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: widget.scaffoldKey,
       appBar: AppBar(
         toolbarHeight: 70,
         title: LayoutBuilder(
@@ -292,7 +297,14 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         ),
         centerTitle: true,
       ),
-      drawer: _buildDrawer(),
+      drawer: AppDrawer(
+        onLogout: () {
+          setState(() {
+            _isLoggedIn = false;
+            _userData = null;
+          });
+        },
+      ),
       body: RefreshIndicator(
         onRefresh: _loadHomePageContent,
         child: _buildBody(),
@@ -1351,7 +1363,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                   // Google Maps placeholder - click to open in browser/app
                   InkWell(
                     onTap: () async {
-                      final url = Uri.parse('https://maps.google.com/?q=Al+khatem+gents+tailoring,Ajman');
+                      final url = Uri.parse('https://maps.google.com/?q=Al+khatm+gents+tailoring,Ajman');
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url, mode: LaunchMode.externalApplication);
                       }
@@ -1360,21 +1372,14 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                       width: double.infinity,
                       height: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: const Color(0xFF79B2D5).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            'https://maps.googleapis.com/maps/api/staticmap?center=25.3848301,55.477339&zoom=15&size=600x400&markers=color:red%7C25.3848301,55.477339&key=YOUR_API_KEY',
-                          ),
-                          fit: BoxFit.cover,
-                          onError: (_, __) {},
-                        ),
                       ),
                       child: Center(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: const Color(0xFF79B2D5),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -1415,7 +1420,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text(
-                            'Al khatem gents tailoring AJM...',
+                            'Al khatm gents tailoring AJM...',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -1529,7 +1534,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
           const SizedBox(height: 8),
           _buildContactItem(
             Icons.location_on,
-            'Al Khatem Gents Tailoring LLC\nExhibition showroom no: 47\nAjman industrial-1 UAE',
+            'Al Khatm Gents Tailoring LLC\nExhibition showroom no: 47\nAjman industrial-1 UAE',
           ),
           const SizedBox(height: 16),
           const Text(

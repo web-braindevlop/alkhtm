@@ -24,6 +24,11 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   final GlobalKey<CartScreenState> _cartKey = GlobalKey<CartScreenState>();
+  final GlobalKey<ScaffoldState> _homeScaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _shopScaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _cartScaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _wishlistScaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _profileScaffoldKey = GlobalKey<ScaffoldState>();
   int _cartItemCount = 0;
   StreamController<int>? _cartCountController;
 
@@ -90,7 +95,33 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
+  void _closeAllDrawers() {
+    // Close drawer on home screen if open
+    if (_homeScaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _homeScaffoldKey.currentState?.closeDrawer();
+    }
+    // Close drawer on shop screen if open
+    if (_shopScaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _shopScaffoldKey.currentState?.closeDrawer();
+    }
+    // Close drawer on cart screen if open
+    if (_cartScaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _cartScaffoldKey.currentState?.closeDrawer();
+    }
+    // Close drawer on wishlist screen if open
+    if (_wishlistScaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _wishlistScaffoldKey.currentState?.closeDrawer();
+    }
+    // Close drawer on profile screen if open
+    if (_profileScaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _profileScaffoldKey.currentState?.closeDrawer();
+    }
+  }
+
   void switchToTab(int index) {
+    // Close any open drawer before switching tabs
+    _closeAllDrawers();
+    
     setState(() {
       _currentIndex = index;
     });
@@ -110,11 +141,11 @@ class MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          const DynamicHomeScreen(),
-          const ShopScreen(),
-          CartScreen(key: _cartKey),
-          const WishlistScreen(),
-          const ProfileScreen(),
+          DynamicHomeScreen(scaffoldKey: _homeScaffoldKey),
+          ShopScreen(scaffoldKey: _shopScaffoldKey),
+          CartScreen(key: _cartKey, scaffoldKey: _cartScaffoldKey),
+          WishlistScreen(scaffoldKey: _wishlistScaffoldKey),
+          ProfileScreen(scaffoldKey: _profileScaffoldKey),
         ],
       ),
       bottomNavigationBar: Container(
@@ -195,6 +226,9 @@ class MainScreenState extends State<MainScreen> {
 
     return GestureDetector(
       onTap: () {
+        // Close any open drawer before switching
+        _closeAllDrawers();
+        
         setState(() {
           _currentIndex = index;
         });
