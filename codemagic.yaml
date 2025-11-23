@@ -1,51 +1,55 @@
 workflows:
   ios-workflow:
-    name: iOS Workflow (Requires Apple Developer Account)
+    name: iOS Workflow
     max_build_duration: 120
     instance_type: mac_mini_m1
     integrations:
       app_store_connect: codemagic
     environment:
       ios_signing:
-        distribution_type: development
+        distribution_type: app_store
         bundle_identifier: com.alkhatm.app
       vars:
         BUNDLE_ID: "com.alkhatm.app"
         XCODE_WORKSPACE: "Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
-        FLUTTER_BUILD_MODE: debug
-        FLUTTER_BUILD_NAME: "1.0.0"
-        FLUTTER_BUILD_NUMBER: "1"
+        APP_STORE_CONNECT_ISSUER_ID: Encrypted(...)
+        APP_STORE_CONNECT_KEY_IDENTIFIER: Encrypted(...)
+        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(...)
+        CERTIFICATE_PRIVATE_KEY: Encrypted(...)
       flutter: stable
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Set up iOS build
+      - name: Set up code signing settings
         script: |
-          echo "Building iOS app with proper code signing"
+          # Set up provisioning profiles
+          echo "Setting up iOS code signing..."
           
       - name: Get Flutter packages
         script: |
           flutter pub get
           
-      - name: Clean iOS build
+      - name: Install CocoaPods dependencies
         script: |
           cd ios
-          rm -rf Pods Podfile.lock
-          flutter clean
+          pod install
           cd ..
           
-      - name: Install CocoaPods
+      - name: Flutter build iOS (no-codesign for debugging)
         script: |
-          cd ios
-          pod install --repo-update
-          cd ..
-          
-      - name: Build iOS IPA
-        script: |
-          flutter build ipa --release \
+          flutter build ios --release \
+            --no-codesign \
             --build-name=1.0.0 \
             --build-number=$BUILD_NUMBER
+            
+      - name: Build iOS IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/Runner.xcworkspace \
+            --scheme Runner \
+            --archive-flags="-destination 'generic/platform=iOS'"
+            
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -53,54 +57,12 @@ workflows:
     publishing:
       email:
         recipients:
+          - web.brain.devlop@gmail.com
           - phrtool000@gmail.com
         notify:
           success: true
           failure: true
       app_store_connect:
         auth: integration
-        submit_to_testflight: false
+        submit_to_testflight: true
         submit_to_app_store: false
-        
-  android-workflow:
-    name: Android Workflow
-    max_build_duration: 120
-    instance_type: linux_x2
-    environment:
-      vars:
-        PACKAGE_NAME: "com.alkhatm.app"
-      flutter: stable
-      java: 17
-    scripts:
-      - name: Get Flutter packages
-        script: |
-          flutter packages pub get
-          
-      - name: Flutter analyze
-        script: |
-          flutter analyze
-          
-      - name: Build APK
-        script: |
-          flutter build apk --release --build-name=1.0.0 --build-number=$BUILD_NUMBER
-          
-      - name: Build App Bundle
-        script: |
-          flutter build appbundle --release --build-name=1.0.0 --build-number=$BUILD_NUMBER
-    artifacts:
-      - build/app/outputs/**/*.apk
-      - build/app/outputs/**/*.aab
-      - build/**/outputs/**/*.json
-      - flutter_drive.log
-    publishing:
-      email:
-        recipients:
-          - YOUR_EMAIL@example.com # Replace with your email
-        notify:
-          success: true
-          failure: true
-      # Uncomment below when ready for Google Play
-      # google_play:
-      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-      #   track: internal
-      #   submit_as_draft: true
