@@ -105,9 +105,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             child: SingleChildScrollView(
               padding: ResponsiveUtils.getScreenPadding(context),
-          child: Form(
-            key: _formKey,
-            child: Column(
+              child: Form(
+                key: _formKey,
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
@@ -323,6 +323,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ],
                 ),
               ],
+            ),
+          ),
             ),
           ),
         ),
