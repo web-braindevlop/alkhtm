@@ -41,7 +41,7 @@ workflows:
           flutter build ios --release \
             --no-codesign \
             --build-name=1.0.0 \
-            --build-number=$BUILD_NUMBER
+            --build-number=$((BUILD_NUMBER + 1))
             
       - name: Build iOS IPA
         script: |
