@@ -730,26 +730,36 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
       },
     ];
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = screenWidth >= 1200 ? 48.0 : (screenWidth >= 800 ? 32.0 : 16.0);
+    final verticalPadding = screenWidth >= 800 ? 16.0 : 8.0;
+    final imageHeight = screenWidth >= 1200 ? 200.0 : (screenWidth >= 800 ? 180.0 : 150.0);
+    final spacing = screenWidth >= 800 ? 20.0 : 12.0;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
       child: Column(
         children: countryFlags.map((country) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: EdgeInsets.only(bottom: spacing),
             child: CachedNetworkImage(
               imageUrl: country['image']!,
               width: double.infinity,
-              height: 150,
+              height: imageHeight,
               fit: BoxFit.contain,
               placeholder: (context, url) => Container(
-                height: 150,
+                height: imageHeight,
                 child: const Center(
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               ),
               errorWidget: (context, url, error) => Container(
-                height: 150,
-                child: const Icon(Icons.flag, size: 80, color: Colors.grey),
+                height: imageHeight,
+                child: Icon(
+                  Icons.flag, 
+                  size: screenWidth >= 800 ? 100 : 80, 
+                  color: Colors.grey,
+                ),
               ),
             ),
           );
@@ -759,24 +769,30 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 
   Widget _buildCompanyDescription() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final padding = screenWidth >= 1200 ? 48.0 : (screenWidth >= 800 ? 32.0 : 24.0);
+    final titleSize = screenWidth >= 1200 ? 24.0 : (screenWidth >= 800 ? 22.0 : 20.0);
+    final textSize = screenWidth >= 1200 ? 16.0 : (screenWidth >= 800 ? 15.0 : 14.0);
+    final spacing = screenWidth >= 800 ? 16.0 : 12.0;
+    
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(padding),
       child: Column(
         children: [
-          const Text(
+          Text(
             'AL KHATM GROUP OF COMPANIES',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: titleSize,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           Text(
             'Established in the year 2005, is a ubiquitous brand name in fashion, including traditional gents fashion, kids fashion, uniforms, accessories, perfumes and footwear.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: textSize,
               color: Colors.grey[700],
               height: 1.5,
             ),
@@ -811,6 +827,9 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
       return key.isNotEmpty ? categoryImages[key] : null;
     }
     
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = screenWidth >= 1200 ? 48.0 : (screenWidth >= 800 ? 32.0 : 16.0);
+    
     return Column(
       children: [
         const SectionHeader(
@@ -818,15 +837,20 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
           subtitle: 'Shop by category',
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, // 3 items per row
-              childAspectRatio: 0.75, // Aspect ratio for each item
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: ResponsiveUtils.getGridCrossAxisCount(
+                context,
+                mobile: 2,
+                tablet: 3,
+                desktop: 6,  // Show all 6 categories in one row on iPad 13\" landscape
+              ),
+              childAspectRatio: screenWidth >= 1200 ? 0.9 : (screenWidth >= 800 ? 0.85 : 0.75),
+              crossAxisSpacing: ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20),
+              mainAxisSpacing: ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20),
             ),
             itemCount: displayCategories.length,
             itemBuilder: (context, index) {
@@ -858,6 +882,17 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 
   Widget _buildFeaturedProductsSection() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = screenWidth >= 1200 ? 48.0 : (screenWidth >= 800 ? 32.0 : 16.0);
+    final crossAxisCount = ResponsiveUtils.getGridCrossAxisCount(
+      context,
+      mobile: 2,
+      tablet: 3,
+      desktop: 4,
+    );
+    final childAspectRatio = screenWidth >= 1200 ? 0.78 : (screenWidth >= 800 ? 0.75 : 0.7);
+    final spacing = screenWidth >= 1200 ? 16.0 : (screenWidth >= 800 ? 14.0 : 12.0);
+    
     return Column(
       children: [
         SectionHeader(
@@ -875,12 +910,12 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.7,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: childAspectRatio,
+            crossAxisSpacing: spacing,
+            mainAxisSpacing: spacing,
           ),
           itemCount: _featuredProducts.length > 4 ? 4 : _featuredProducts.length,
           itemBuilder: (context, index) {
@@ -1567,14 +1602,20 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 
   Widget _buildFooterSection() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final verticalPadding = screenWidth >= 1200 ? 56.0 : (screenWidth >= 800 ? 48.0 : 40.0);
+    final horizontalPadding = screenWidth >= 1200 ? 48.0 : (screenWidth >= 800 ? 32.0 : 16.0);
+    final cardHeight = screenWidth >= 1200 ? 320.0 : (screenWidth >= 800 ? 300.0 : 280.0);
+    final copyrightSize = screenWidth >= 800 ? 14.0 : 12.0;
+    
     return Container(
       color: const Color(0xFF1a1a1a),
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
       child: Column(
         children: [
           // Slideable footer cards
           SizedBox(
-            height: 280,
+            height: cardHeight,
             child: PageView(
               controller: _footerPageController,
               onPageChanged: (index) {
@@ -1618,9 +1659,9 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
           const SizedBox(height: 20),
           Text(
             '© ${DateTime.now().year} AL KHATM. All rights reserved.',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white54,
-              fontSize: 12,
+              fontSize: copyrightSize,
             ),
             textAlign: TextAlign.center,
           ),
@@ -1630,12 +1671,20 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 
   Widget _buildFooterCard(String title, String content, IconData icon, {bool showLogo = false, bool showSocialMedia = false}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardPadding = screenWidth >= 1200 ? 32.0 : (screenWidth >= 800 ? 28.0 : 24.0);
+    final logoHeight = screenWidth >= 1200 ? 70.0 : (screenWidth >= 800 ? 65.0 : 60.0);
+    final iconSize = screenWidth >= 800 ? 32.0 : 28.0;
+    final titleSize = screenWidth >= 1200 ? 20.0 : (screenWidth >= 800 ? 19.0 : 18.0);
+    final contentSize = screenWidth >= 1200 ? 16.0 : (screenWidth >= 800 ? 15.0 : 14.0);
+    final borderRadius = screenWidth >= 800 ? 20.0 : 16.0;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.all(24),
+      margin: EdgeInsets.symmetric(horizontal: screenWidth >= 800 ? 12 : 8),
+      padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         color: const Color(0xFF2a2a2a),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
           color: Colors.white.withOpacity(0.1),
           width: 1,
@@ -1648,20 +1697,20 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
             Center(
               child: CachedNetworkImage(
                 imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
-                height: 60,
+                height: logoHeight,
                 fit: BoxFit.contain,
-                placeholder: (context, url) => const SizedBox(
-                  height: 60,
-                  child: Center(
+                placeholder: (context, url) => SizedBox(
+                  height: logoHeight,
+                  child: const Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: Colors.white,
                     ),
                   ),
                 ),
-                errorWidget: (context, url, error) => const SizedBox(
-                  height: 60,
-                  child: Center(
+                errorWidget: (context, url, error) => SizedBox(
+                  height: logoHeight,
+                  child: const Center(
                     child: Icon(Icons.image, size: 30, color: Colors.white24),
                   ),
                 ),
@@ -1670,19 +1719,19 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
           else
             Row(
               children: [
-                Icon(icon, color: const Color(0xFF79B2D5), size: 28),
+                Icon(icon, color: const Color(0xFF79B2D5), size: iconSize),
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: titleSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenWidth >= 800 ? 20 : 16),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -1690,19 +1739,19 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                 children: [
                   Text(
                     content,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 14,
+                      fontSize: contentSize,
                       height: 1.6,
                     ),
                   ),
                   if (showSocialMedia) ...[
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'Follow Us:',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: contentSize,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

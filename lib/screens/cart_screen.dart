@@ -259,9 +259,15 @@ class CartScreenState extends State<CartScreen> {
 
   Widget _buildCheckoutSection() {
     final total = _calculateTotal();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final padding = screenWidth >= 1200 ? 32.0 : (screenWidth >= 800 ? 24.0 : 16.0);
+    final titleSize = screenWidth >= 800 ? 24.0 : 20.0;
+    final priceSize = screenWidth >= 800 ? 28.0 : 24.0;
+    final buttonHeight = screenWidth >= 800 ? 60.0 : 50.0;
+    final buttonFontSize = screenWidth >= 800 ? 18.0 : 16.0;
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -278,27 +284,27 @@ class CartScreenState extends State<CartScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Total:',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: titleSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   'د.إ ${total.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: priceSize,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF79B2D5),
+                    color: const Color(0xFF79B2D5),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: screenWidth >= 800 ? 20 : 16),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: buttonHeight,
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
@@ -317,13 +323,13 @@ class CartScreenState extends State<CartScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF79B2D5),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(screenWidth >= 800 ? 16 : 12),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Proceed to Checkout',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: buttonFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

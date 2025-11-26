@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../utils/responsive_utils.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/wordpress_models.dart';
@@ -254,23 +255,26 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Always use large screen layout (side-by-side) for iPhone and above
-    // Use small screen layout (stacked) only for very small screens (below 320px)
     final screenWidth = MediaQuery.of(context).size.width;
-    final useStackedLayout = screenWidth < 320; // Stack only on screens smaller than iPhone SE
+    final useStackedLayout = screenWidth < 320;
+    
+    // Responsive margin and elevation
+    final margin = screenWidth >= 1200 ? 32.0 : (screenWidth >= 800 ? 24.0 : 16.0);
+    final elevation = screenWidth >= 800 ? 4.0 : 2.0;
+    final borderRadius = screenWidth >= 800 ? 20.0 : 16.0;
 
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.all(16),
+      elevation: elevation,
+      margin: EdgeInsets.all(margin),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
-      color: backgroundColor ?? const Color(0xFF79B2D5), // Correct blue background #79b2d5
+      color: backgroundColor ?? const Color(0xFF79B2D5),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
         child: useStackedLayout
             ? _buildSmallScreenLayout(context)
-            : _buildLargeScreenLayout(context), // Side-by-side layout for all iPhones
+            : _buildLargeScreenLayout(context),
       ),
     );
   }
@@ -279,59 +283,84 @@ class HeroSection extends StatelessWidget {
   Widget _buildLargeScreenLayout(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     
+    // Responsive padding for iPad 13"
+    double horizontalPadding = 20.0;
+    double verticalPadding = 24.0;
+    if (screenWidth >= 1200) {
+      horizontalPadding = 48.0;  // iPad 13" landscape
+      verticalPadding = 40.0;
+    } else if (screenWidth >= 800) {
+      horizontalPadding = 36.0;  // iPad 13" portrait
+      verticalPadding = 32.0;
+    }
+    
+    // Responsive font sizes for iPad 13"
+    double titleSize = 22.0;
+    double subtitleSize = 12.0;
+    if (screenWidth >= 1200) {
+      titleSize = 36.0;      // iPad 13" landscape
+      subtitleSize = 16.0;
+    } else if (screenWidth >= 800) {
+      titleSize = 30.0;      // iPad 13" portrait
+      subtitleSize = 14.0;
+    } else if (screenWidth >= 600) {
+      titleSize = 26.0;
+      subtitleSize = 13.0;
+    }
+    
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth < 600 ? 20.0 : 32.0,
-        vertical: screenWidth < 600 ? 24.0 : 32.0,
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Left side - Text content (55% width)
+          // Left side - Text content (60% width on iPad)
           Expanded(
-            flex: 55,
+            flex: screenWidth >= 800 ? 60 : 55,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Title - Responsive size
+                // Title - Fully responsive
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: screenWidth < 600 ? 22 : 28,
+                    fontSize: titleSize,
                     fontWeight: FontWeight.w800,
                     color: textColor ?? Colors.black,
                     height: 1.2,
-                    letterSpacing: -0.3,
+                    letterSpacing: screenWidth >= 800 ? -0.5 : -0.3,
                   ),
                 ),
-                SizedBox(height: screenWidth < 600 ? 12 : 16),
-                // Subtitle/Description - All content visible
+                SizedBox(height: screenWidth >= 800 ? 20 : 12),
+                // Subtitle - Fully responsive
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: screenWidth < 600 ? 12 : 14,
+                    fontSize: subtitleSize,
                     fontWeight: FontWeight.w400,
-                    color: (textColor ?? Colors.black).withOpacity(0.8),
-                    height: 1.6,
-                    letterSpacing: 0.1,
+                    color: (textColor ?? Colors.black).withOpacity(0.85),
+                    height: screenWidth >= 800 ? 1.7 : 1.6,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ],
             ),
           ),
           
-          // Right side - Image (45% width - increased)
+          // Right side - Image (40% width on iPad)
           if (imageUrl != null && imageUrl!.isNotEmpty)
             Expanded(
-              flex: 45,
+              flex: screenWidth >= 800 ? 40 : 45,
               child: Padding(
                 padding: EdgeInsets.only(
-                  right: screenWidth < 600 ? 0.0 : 8.0,
-                  top: screenWidth < 600 ? 20.0 : 24.0,
-                  bottom: screenWidth < 600 ? 12.0 : 16.0,
-                  left: screenWidth < 600 ? 8.0 : 12.0,
+                  right: 0.0,
+                  top: screenWidth >= 1200 ? 28.0 : (screenWidth >= 800 ? 24.0 : 20.0),
+                  bottom: screenWidth >= 1200 ? 20.0 : (screenWidth >= 800 ? 16.0 : 12.0),
+                  left: screenWidth >= 1200 ? 20.0 : (screenWidth >= 800 ? 16.0 : 8.0),
                 ),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl!,
@@ -344,13 +373,12 @@ class HeroSection extends StatelessWidget {
                     ),
                   ),
                   errorWidget: (context, url, error) {
-                    // Image load error
                     return Container(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.image_not_supported, 
-                            size: 48, 
+                            size: screenWidth >= 800 ? 64 : 48, 
                             color: (textColor ?? Colors.black).withOpacity(0.3),
                           ),
                           const SizedBox(height: 8),
@@ -358,7 +386,7 @@ class HeroSection extends StatelessWidget {
                             'Image not available',
                             style: TextStyle(
                               color: (textColor ?? Colors.black).withOpacity(0.5),
-                              fontSize: 12,
+                              fontSize: screenWidth >= 800 ? 14 : 12,
                             ),
                           ),
                         ],
@@ -542,8 +570,18 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Responsive padding
+    final horizontalPadding = screenWidth >= 1200 ? 48.0 : (screenWidth >= 800 ? 32.0 : 16.0);
+    final verticalPadding = screenWidth >= 800 ? 20.0 : 12.0;
+    
+    // Responsive font sizes
+    final titleSize = screenWidth >= 1200 ? 32.0 : (screenWidth >= 800 ? 28.0 : 24.0);
+    final subtitleSize = screenWidth >= 800 ? 16.0 : 14.0;
+    
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -552,17 +590,18 @@ class SectionHeader extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: TextStyle(
+                  fontSize: titleSize,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
                 ),
               ),
               if (subtitle != null) ...[
-                const SizedBox(height: 4),
+                SizedBox(height: screenWidth >= 800 ? 6 : 4),
                 Text(
                   subtitle!,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: subtitleSize,
                     color: Colors.grey[600],
                   ),
                 ),
@@ -572,7 +611,12 @@ class SectionHeader extends StatelessWidget {
           if (onViewAll != null)
             TextButton(
               onPressed: onViewAll,
-              child: const Text('View All'),
+              child: Text(
+                'View All',
+                style: TextStyle(
+                  fontSize: screenWidth >= 800 ? 16.0 : 14.0,
+                ),
+              ),
             ),
         ],
       ),

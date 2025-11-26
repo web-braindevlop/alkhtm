@@ -145,16 +145,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = screenWidth >= 800 ? 120.0 : 100.0;
+    final spacing = screenWidth >= 800 ? 48.0 : 40.0;
+    final buttonHeight = screenWidth >= 800 ? 64.0 : 56.0;
+    final fontSize = screenWidth >= 800 ? 18.0 : 16.0;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(
+          'Login',
+          style: TextStyle(fontSize: screenWidth >= 800 ? 22 : 20),
+        ),
         backgroundColor: const Color(0xFF79B2D5),
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: ResponsiveUtils.isTablet(context) || ResponsiveUtils.isDesktop(context) ? 500 : double.infinity,
+              maxWidth: screenWidth >= 1200 ? 600 : (screenWidth >= 800 ? 550 : double.infinity),
             ),
             child: SingleChildScrollView(
               padding: ResponsiveUtils.getScreenPadding(context),
@@ -163,29 +172,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
+                SizedBox(height: spacing),
                 
                 // Logo or Icon
                 Icon(
                   Icons.account_circle,
-                  size: 100,
+                  size: iconSize,
                   color: const Color(0xFF79B2D5),
                 ),
                 
-                const SizedBox(height: 40),
+                SizedBox(height: spacing),
                 
                 // Email
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  style: TextStyle(fontSize: fontSize),
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
+                    labelStyle: TextStyle(fontSize: fontSize),
+                    prefixIcon: Icon(Icons.email, size: screenWidth >= 800 ? 28 : 24),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(screenWidth >= 800 ? 16 : 12),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(screenWidth >= 800 ? 16 : 12),
                       borderSide: const BorderSide(color: Color(0xFF79B2D5), width: 2),
                     ),
                   ),
@@ -196,26 +207,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 
-                const SizedBox(height: 16),
+                SizedBox(height: screenWidth >= 800 ? 20 : 16),
                 
                 // Password
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  style: TextStyle(fontSize: fontSize),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
+                    labelStyle: TextStyle(fontSize: fontSize),
+                    prefixIcon: Icon(Icons.lock, size: screenWidth >= 800 ? 28 : 24),
                     suffixIcon: IconButton(
                       icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      iconSize: screenWidth >= 800 ? 28 : 24,
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(screenWidth >= 800 ? 16 : 12),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(screenWidth >= 800 ? 16 : 12),
                       borderSide: const BorderSide(color: Color(0xFF79B2D5), width: 2),
                     ),
                   ),
@@ -225,24 +239,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 
-                const SizedBox(height: 24),
+                SizedBox(height: screenWidth >= 800 ? 32 : 24),
                 
                 // Login Button
                 SizedBox(
-                  height: 56,
+                  height: buttonHeight,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF79B2D5),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(screenWidth >= 800 ? 16 : 12),
                       ),
                     ),
                     child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
+                        ? SizedBox(
+                            width: screenWidth >= 800 ? 28 : 24,
+                            height: screenWidth >= 800 ? 28 : 24,
+                            child: const CircularProgressIndicator(
                               color: Colors.white,
                               strokeWidth: 2,
                             ),
