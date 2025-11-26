@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/woocommerce_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/content_widgets.dart';
+import '../utils/responsive_utils.dart';
 import '../main.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -99,7 +100,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           _buildImageGallery(),
 
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: ResponsiveUtils.getScreenPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

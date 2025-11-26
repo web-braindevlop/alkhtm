@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../utils/responsive_utils.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -150,11 +151,16 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: const Color(0xFF79B2D5),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveUtils.isTablet(context) || ResponsiveUtils.isDesktop(context) ? 500 : double.infinity,
+            ),
+            child: SingleChildScrollView(
+              padding: ResponsiveUtils.getScreenPadding(context),
+              child: Form(
+                key: _formKey,
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
@@ -300,6 +306,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+      ),
+    ),
     );
   }
 }

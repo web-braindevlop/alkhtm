@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'checkout_screen.dart';
 import '../widgets/app_drawer.dart';
+import '../utils/responsive_utils.dart';
 
 class CartScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -150,7 +151,7 @@ class CartScreenState extends State<CartScreen> {
                   children: [
                     Expanded(
                       child: ListView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: ResponsiveUtils.getScreenPadding(context),
                         itemCount: _cartItems.length,
                         itemBuilder: (context, index) {
                           final item = _cartItems[index];
@@ -165,34 +166,37 @@ class CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildCartItem(Map<String, dynamic> item, int index) {
+    final double imageSize = ResponsiveUtils.isTablet(context) ? 100 : 80;
+    final double spacing = ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20);
+    
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: spacing),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(spacing),
         child: Row(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: CachedNetworkImage(
                 imageUrl: item['image'] ?? '',
-                width: 80,
-                height: 80,
+                width: imageSize,
+                height: imageSize,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
-                  width: 80,
-                  height: 80,
+                  width: imageSize,
+                  height: imageSize,
                   color: Colors.grey[200],
                   child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
                 ),
                 errorWidget: (context, url, error) => Container(
-                  width: 80,
-                  height: 80,
+                  width: imageSize,
+                  height: imageSize,
                   color: Colors.grey[200],
                   child: const Icon(Icons.image, color: Colors.grey),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: spacing),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

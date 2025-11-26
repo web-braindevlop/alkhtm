@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../services/woocommerce_service.dart';
 import '../services/auth_service.dart';
+import '../utils/responsive_utils.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -359,6 +360,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = ResponsiveUtils.isTablet(context) || ResponsiveUtils.isDesktop(context);
+    final spacing = ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkout'),
@@ -366,190 +370,377 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       body: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Billing Details Section
-            _buildSectionHeader('Billing Details'),
-            const SizedBox(height: 16),
-            
-            _buildTextField(
-              controller: _firstNameController,
-              label: 'First Name *',
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'First name is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _lastNameController,
-              label: 'Last Name *',
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Last name is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _companyController,
-              label: 'Company Name (optional)',
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _countryController,
-              label: 'Country / Region *',
-              enabled: false,
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _address1Controller,
-              label: 'Street Address *',
-              hint: 'House number and street name',
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Street address is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _address2Controller,
-              label: 'Apartment, suite, unit, etc. (optional)',
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _cityController,
-              label: 'Town / City *',
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'City is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _stateController,
-              label: 'State / County (optional)',
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _postcodeController,
-              label: 'Postcode / ZIP (optional)',
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _phoneController,
-              label: 'Phone *',
-              keyboardType: TextInputType.phone,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
-              ],
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Phone number is required';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            _buildTextField(
-              controller: _emailController,
-              label: 'Email Address *',
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Email address is required';
-                }
-                if (!value.trim().contains('@') || !value.trim().contains('.')) {
-                  return 'Please enter a valid email address';
-                }
-                return null;
-              },
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Order Notes
-            _buildSectionHeader('Additional Information'),
-            const SizedBox(height: 16),
-            
-            _buildTextField(
-              controller: _orderNotesController,
-              label: 'Order Notes (optional)',
-              hint: 'Notes about your order, e.g. special notes for delivery',
-              maxLines: 4,
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Order Review
-            _buildSectionHeader('Your Order'),
-            const SizedBox(height: 16),
-            
-            _buildOrderReview(),
-            
-            const SizedBox(height: 24),
-            
-            // Payment Methods
-            _buildSectionHeader('Payment'),
-            const SizedBox(height: 16),
-            
-            _buildPaymentMethods(),
-            
-            const SizedBox(height: 32),
-            
-            // Place Order Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isProcessing ? null : _placeOrder,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF79B2D5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _isProcessing
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text(
-                        'Place Order',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+        child: isTablet ? _buildTabletLayout(spacing) : _buildMobileLayout(spacing),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(double spacing) {
+    return ListView(
+      padding: ResponsiveUtils.getScreenPadding(context),
+      children: [
+        // Billing Details Section
+        _buildSectionHeader('Billing Details'),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _firstNameController,
+          label: 'First Name *',
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'First name is required';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _lastNameController,
+          label: 'Last Name *',
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Last name is required';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _companyController,
+          label: 'Company Name (optional)',
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _countryController,
+          label: 'Country / Region *',
+          enabled: false,
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _address1Controller,
+          label: 'Street Address *',
+          hint: 'House number and street name',
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Street address is required';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _address2Controller,
+          label: 'Apartment, suite, unit, etc. (optional)',
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _cityController,
+          label: 'Town / City *',
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'City is required';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _stateController,
+          label: 'State / County (optional)',
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _postcodeController,
+          label: 'Postcode / ZIP (optional)',
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _phoneController,
+          label: 'Phone *',
+          keyboardType: TextInputType.phone,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
+          ],
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Phone number is required';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _emailController,
+          label: 'Email Address *',
+          keyboardType: TextInputType.emailAddress,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Email address is required';
+            }
+            if (!value.trim().contains('@') || !value.trim().contains('.')) {
+              return 'Please enter a valid email address';
+            }
+            return null;
+          },
+        ),
+        
+        SizedBox(height: spacing * 2),
+        
+        // Order Notes
+        _buildSectionHeader('Additional Information'),
+        SizedBox(height: spacing),
+        
+        _buildTextField(
+          controller: _orderNotesController,
+          label: 'Order Notes (optional)',
+          hint: 'Notes about your order, e.g. special notes for delivery',
+          maxLines: 4,
+        ),
+        
+        SizedBox(height: spacing * 2),
+        
+        // Order Review
+        _buildSectionHeader('Your Order'),
+        SizedBox(height: spacing),
+        
+        _buildOrderReview(),
+        
+        SizedBox(height: spacing * 2),
+        
+        // Payment Methods
+        _buildSectionHeader('Payment'),
+        SizedBox(height: spacing),
+        
+        _buildPaymentMethods(),
+        
+        const SizedBox(height: 32),
+        
+        // Place Order Button
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: _isProcessing ? null : _placeOrder,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF79B2D5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            
-            const SizedBox(height: 24),
+            child: _isProcessing
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    'Place Order',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+          ),
+        ),
+        
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout(double spacing) {
+    return ListView(
+      padding: ResponsiveUtils.getScreenPadding(context),
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Left Column: Billing Form
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionHeader('Billing Details'),
+                  SizedBox(height: spacing),
+                  _buildSectionHeader('Billing Details'),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _firstNameController,
+                    label: 'First Name *',
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'First name is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _lastNameController,
+                    label: 'Last Name *',
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Last name is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _companyController,
+                    label: 'Company Name (optional)',
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _countryController,
+                    label: 'Country / Region *',
+                    enabled: false,
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _address1Controller,
+                    label: 'Street Address *',
+                    hint: 'House number and street name',
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Street address is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _address2Controller,
+                    label: 'Apartment, suite, unit, etc. (optional)',
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _cityController,
+                    label: 'Town / City *',
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'City is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _stateController,
+                    label: 'State / County (optional)',
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _postcodeController,
+                    label: 'Postcode / ZIP (optional)',
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _phoneController,
+                    label: 'Phone *',
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9+]')),
+                    ],
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Phone number is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _emailController,
+                    label: 'Email Address *',
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Email address is required';
+                      }
+                      if (!value.trim().contains('@') || !value.trim().contains('.')) {
+                        return 'Please enter a valid email address';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: spacing * 2),
+                  _buildSectionHeader('Additional Information'),
+                  SizedBox(height: spacing),
+                  _buildTextField(
+                    controller: _orderNotesController,
+                    label: 'Order Notes (optional)',
+                    hint: 'Notes about your order, e.g. special notes for delivery',
+                    maxLines: 4,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: spacing * 2),
+            // Right Column: Order Summary
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionHeader('Your Order'),
+                  SizedBox(height: spacing),
+                  _buildOrderReview(),
+                  SizedBox(height: spacing * 2),
+                  _buildSectionHeader('Payment'),
+                  SizedBox(height: spacing),
+                  _buildPaymentMethods(),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _isProcessing ? null : _placeOrder,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF79B2D5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isProcessing
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Place Order',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
-      ),
+        const SizedBox(height: 24),
+      ],
     );
   }
 

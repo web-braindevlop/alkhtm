@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import '../services/wordpress_service.dart';
 import '../services/woocommerce_service.dart';
 import '../services/auth_service.dart';
+import '../utils/responsive_utils.dart';
 import '../models/wordpress_models.dart';
 import '../widgets/content_widgets.dart';
 import '../widgets/app_drawer.dart';

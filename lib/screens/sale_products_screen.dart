@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/woocommerce_service.dart';
 import '../widgets/content_widgets.dart';
+import '../utils/responsive_utils.dart';
 import 'product_detail_screen.dart';
 import 'main_screen.dart';
 
@@ -125,12 +126,17 @@ class _SaleProductsScreenState extends State<SaleProductsScreen> {
                   onRefresh: _loadProducts,
                   child: GridView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.7,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
+                    padding: ResponsiveUtils.getScreenPadding(context),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: ResponsiveUtils.getGridCrossAxisCount(
+                        context,
+                        mobile: 2,
+                        tablet: 3,
+                        desktop: 4,
+                      ),
+                      childAspectRatio: ResponsiveUtils.getCardAspectRatio(context),
+                      crossAxisSpacing: ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20),
+                      mainAxisSpacing: ResponsiveUtils.getSpacing(context, mobile: 12, tablet: 16, desktop: 20),
                     ),
                     itemCount: _products.length + (_hasMore ? 1 : 0),
                     itemBuilder: (context, index) {

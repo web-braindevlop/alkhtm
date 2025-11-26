@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
+import '../utils/responsive_utils.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -97,8 +98,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: const Color(0xFF79B2D5),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveUtils.isTablet(context) || ResponsiveUtils.isDesktop(context) ? 500 : double.infinity,
+            ),
+            child: SingleChildScrollView(
+              padding: ResponsiveUtils.getScreenPadding(context),
           child: Form(
             key: _formKey,
             child: Column(

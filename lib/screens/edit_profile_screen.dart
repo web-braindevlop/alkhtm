@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
+import '../utils/responsive_utils.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
