@@ -52,5 +52,21 @@
 	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	
+	<!-- Privacy - Microphone Usage Description -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app does not use the microphone. This permission is required by a third-party library.</string>
+	
+	<!-- Privacy - Camera Usage Description (often required with microphone) -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app does not use the camera. This permission is required by a third-party library.</string>
+	
+	<!-- Privacy - Photo Library Usage Description -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to select images.</string>
+	
+	<!-- Privacy - Location When In Use Usage Description -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app does not track your location. This permission is required by a third-party library.</string>
 </dict>
 </plist>
