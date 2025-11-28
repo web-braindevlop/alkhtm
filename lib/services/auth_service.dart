@@ -267,4 +267,37 @@ class AuthService {
       return false;
     }
   }
+
+  // Delete user account (Apple App Store requirement - Guideline 5.1.1(v))
+  Future<bool> deleteAccount() async {
+    try {
+      final userId = await getUserId();
+      final token = await getToken();
+      
+      if (userId == null || token == null) {
+        return false;
+      }
+
+      final response = await http.post(
+        Uri.parse(ApiConfig.buildUrl('delete_user_account')),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'user_id': userId,
+          'token': token,
+        }),
+      ).timeout(ApiConfig.timeout);
+
+      final data = jsonDecode(response.body);
+      
+      if (response.statusCode == 200 && data['success'] == true) {
+        // Clear local session data after successful account deletion
+        await logout();
+        return true;
+      }
+      
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }

@@ -4,6 +4,7 @@ import '../utils/responsive_utils.dart';
 import 'login_screen.dart';
 import 'order_history_screen.dart';
 import 'edit_profile_screen.dart';
+import 'account_settings_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../widgets/app_drawer.dart';
 
@@ -206,6 +207,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const OrderHistoryScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActionCard(
+                    icon: Icons.settings,
+                    title: 'Account Settings',
+                    subtitle: 'Manage your account preferences',
+                    color: Colors.orange,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountSettingsScreen(),
                         ),
                       );
                     },
