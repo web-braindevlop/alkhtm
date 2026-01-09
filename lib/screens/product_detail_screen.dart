@@ -30,13 +30,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _loadCachedProductInstantly();
     _loadProduct();
   }
 
-  Future<void> _loadProduct() async {
-    if (!mounted) return;
-    setState(() => _isLoading = true);
+  // ⚡ INSTANT LOADING: Load cached product immediately
+  Future<void> _loadCachedProductInstantly() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cacheKey = 'product_${widget.productId}';
+      final cachedProduct = prefs.getString(cacheKey);
+      
+      if (cachedProduct != null) {
+        final json = jsonDecode(cachedProduct);
+        final product = WooProduct.fromJson(json);
+        
+        setState(() {
+          _product = product;
+          _isLoading = false;
+        });
+        
+        print('✅ [CACHE] Product ${widget.productId} loaded instantly from cache');
+        
+        // Load related products from cache too
+        if (product.relatedIds.isNotEmpty) {
+          _loadRelatedProducts(product.relatedIds);
+        }
+      }
+    } catch (e) {
+      print('⚠️ [CACHE] Error loading cached product: $e');
+    }
+  }
 
+  Future<void> _loadProduct() async {
+    print('🔄 [BACKGROUND] Refreshing product ${widget.productId} in background...');
+    
     final product = await _service.getProduct(widget.productId);
 
     if (!mounted) return;
@@ -44,6 +72,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _product = product;
       _isLoading = false;
     });
+
+    // Cache the product for next time
+    if (product != null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final cacheKey = 'product_${widget.productId}';
+        await prefs.setString(cacheKey, jsonEncode(product.toJson()));
+        print('✅ [CACHE] Product ${widget.productId} cached for instant future loads');
+      } catch (e) {
+        print('⚠️ [CACHE] Error caching product: $e');
+      }
+    }
 
     // Load related products
     if (product != null && product.relatedIds.isNotEmpty) {
@@ -73,14 +113,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_product?.name ?? 'Product'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              // TODO: Share product
-            },
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -256,7 +288,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: _product!.description.isNotEmpty
           ? HtmlWidget(
               _product!.description,
-              textStyle: const TextStyle(fontSize: 14, height: 1.5),
+              textStyle: TextStyle(fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14), height: 1.5),
             )
           : const Center(
               child: Text('No description available'),

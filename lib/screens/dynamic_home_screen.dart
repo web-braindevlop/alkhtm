@@ -1,15 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/wordpress_service.dart';
 import '../services/woocommerce_service.dart';
 import '../services/auth_service.dart';
 import '../utils/responsive_utils.dart';
 import '../models/wordpress_models.dart';
+import '../models/api_response.dart';
 import '../widgets/content_widgets.dart';
 import '../widgets/app_drawer.dart';
 import '../config/api_config.dart';
@@ -75,7 +78,8 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     _showcasePageController = PageController(viewportFraction: 0.45);
     _footerPageController = PageController();
     _startShowcaseAutoplay();
-    _loadHomePageContent();
+    _loadCachedDataInstantly(); // ⚡ Load cached data first (INSTANT)
+    _loadHomePageContent();     // Then refresh in background
     _checkLoginStatus();
   }
   
@@ -174,26 +178,149 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     return socialLinks;
   }
 
-  Future<void> _loadHomePageContent() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
-
+  // ⚡ INSTANT LOADING: Load cached data immediately (zero loading time)
+  Future<void> _loadCachedDataInstantly() async {
     try {
-      // Load data sequentially with proper typing
-      final siteInfoResponse = await _wpService.getSiteInfo();
-      final homepageResponse = await _wpService.getPage(214); // Get homepage by ID
-      final categories = await _wooService.getCategories();
+      final prefs = await SharedPreferences.getInstance();
       
-      final featuredProducts = await _wooService.getFeaturedProducts(perPage: 8);
-      final saleProducts = await _wooService.getSaleProducts(perPage: 8);
+      // Check cache version - clear old cache if incompatible
+      const currentCacheVersion = 2; // Increment this when cache structure changes
+      final cachedVersion = prefs.getInt('cache_version') ?? 0;
       
-      // Load contact page to extract social links and contact info
+      if (cachedVersion < currentCacheVersion) {
+        print('🔄 [CACHE] Old cache format detected (v$cachedVersion), clearing...');
+        await prefs.clear();
+        await prefs.setInt('cache_version', currentCacheVersion);
+        setState(() {
+          _isLoading = true;
+        });
+        return;
+      }
+      
+      // Load all cached data
+      final cachedHomepage = prefs.getString('cached_homepage');
+      final cachedCategories = prefs.getString('cached_categories');
+      final cachedFeaturedProducts = prefs.getString('cached_featured_products');
+      final cachedSaleProducts = prefs.getString('cached_sale_products');
+      final cachedSiteInfo = prefs.getString('cached_site_info');
+      final cachedContactInfo = prefs.getString('cached_contact_info');
+      
+      // Show cached data immediately if available
+      if (cachedHomepage != null || cachedCategories != null) {
+        print('⚡ [CACHE] Loading cached data instantly - NO LOADING STATE!');
+        
+        setState(() {
+          _isLoading = false; // ⚡ NO LOADING!
+          
+          // Homepage
+          if (cachedHomepage != null) {
+            try {
+              final json = jsonDecode(cachedHomepage);
+              _homepage = Post.fromJson(json);
+            } catch (e) {
+              print('⚠️ [CACHE] Failed to parse homepage: $e');
+            }
+          }
+          
+          // Categories
+          if (cachedCategories != null) {
+            try {
+              _categories = jsonDecode(cachedCategories);
+            } catch (e) {
+              print('⚠️ [CACHE] Failed to parse categories: $e');
+            }
+          }
+          
+          // Featured Products
+          if (cachedFeaturedProducts != null) {
+            try {
+              _featuredProducts = jsonDecode(cachedFeaturedProducts);
+            } catch (e) {
+              print('⚠️ [CACHE] Failed to parse featured products: $e');
+            }
+          }
+          
+          // Sale Products
+          if (cachedSaleProducts != null) {
+            try {
+              _saleProducts = jsonDecode(cachedSaleProducts);
+            } catch (e) {
+              print('⚠️ [CACHE] Failed to parse sale products: $e');
+            }
+          }
+          
+          // Site Info
+          if (cachedSiteInfo != null) {
+            try {
+              final json = jsonDecode(cachedSiteInfo);
+              _siteInfo = SiteInfo.fromJson(json);
+            } catch (e) {
+              print('⚠️ [CACHE] Failed to parse site info: $e');
+            }
+          }
+          
+          // Contact Info
+          if (cachedContactInfo != null) {
+            try {
+              final json = jsonDecode(cachedContactInfo);
+              _socialLinks = Map<String, String>.from(json['social_links'] ?? {});
+              _contactPhone = json['phone'] ?? '+971566810269';
+              _contactEmail = json['email'] ?? 'info@alkhatm.com';
+              _contactAddress = json['address'] ?? 'Al Khatm Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
+            } catch (e) {
+              print('⚠️ [CACHE] Failed to parse contact info: $e');
+            }
+          }
+        });
+        
+        print('✅ [CACHE] Cached data loaded instantly!');
+      } else {
+        // First time user - show loading only once
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } catch (e) {
+      print('⚠️ [CACHE] Error loading cached data: $e');
+      setState(() {
+        _isLoading = true;
+      });
+    }
+  }
+
+  // 🔄 BACKGROUND REFRESH: Update content silently in background
+  Future<void> _loadHomePageContent() async {
+    // NO loading state! Content updates silently in background
+    try {
+      final totalStartTime = DateTime.now();
+      print('🔄 [BACKGROUND] Refreshing content in background...');
+      
+      // ⚡ OPTIMIZATION: Load ALL data in PARALLEL using Future.wait
+      final results = await Future.wait([
+        _wpService.getSiteInfo(),           // 0
+        _wpService.getPage(214),            // 1 - Homepage
+        _wooService.getCategories(),        // 2
+        _wooService.getFeaturedProducts(perPage: 8),  // 3
+        _wooService.getSaleProducts(perPage: 8),      // 4
+        _wpService.getPage(807),            // 5 - Contact page
+      ]);
+      
+      print('✅ [BACKGROUND] All API calls completed: ${DateTime.now().difference(totalStartTime).inMilliseconds}ms');
+      
+      // Extract results
+      final siteInfoResponse = results[0];
+      final homepageResponse = results[1];
+      final categories = results[2] as List<dynamic>;
+      final featuredProducts = results[3] as List<dynamic>;
+      final saleProducts = results[4] as List<dynamic>;
+      final contactPageResponse = results[5];
+      
+      // Extract contact page info
       try {
-        final contactPageResponse = await _wpService.getPage(807);
-        if (contactPageResponse.isSuccess && contactPageResponse.data != null) {
-          final pageHtml = await http.get(Uri.parse(contactPageResponse.data!.url));
+        final contactResponse = contactPageResponse as ApiResponse<Post>;
+        if (contactResponse.isSuccess && contactResponse.data != null) {
+          final pageHtml = await http.get(Uri.parse(contactResponse.data!.url));
+          
           if (pageHtml.statusCode == 200) {
             final htmlContent = pageHtml.body;
             _socialLinks = _extractSocialLinks(htmlContent);
@@ -209,16 +336,217 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         _contactEmail = 'info@alkhatm.com';
         _contactAddress = 'Al Khatm Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
       }
+      
+      print('✅ [BACKGROUND] Total refresh time: ${DateTime.now().difference(totalStartTime).inMilliseconds}ms');
+
+      // Update UI silently with fresh data
+      setState(() {
+        // Site info
+        final siteInfo = siteInfoResponse as ApiResponse<SiteInfo>;
+        if (siteInfo.isSuccess) {
+          _siteInfo = siteInfo.data;
+        }
+
+        // Homepage content
+        final homepage = homepageResponse as ApiResponse<Post>;
+        if (homepage.isSuccess && homepage.data != null) {
+          _homepage = homepage.data;
+        }
+
+        // Categories
+        _categories = categories;
+
+        // Featured products
+        _featuredProducts = featuredProducts;
+
+        // Sale products
+        _saleProducts = saleProducts;
+
+        _isLoading = false; // Ensure no loading state
+      });
+      
+      // 💾 Cache the fresh data for next instant load
+      await _cacheData(
+        siteInfoResponse: siteInfoResponse,
+        homepageResponse: homepageResponse,
+        categories: categories,
+        featuredProducts: featuredProducts,
+        saleProducts: saleProducts,
+      );
+      
+      print('✅ [CACHE] Fresh data cached for next instant load');
+      
+    } catch (e) {
+      print('⚠️ [BACKGROUND] Error refreshing content: $e');
+      // Don't show error to user - they already have cached content
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // 💾 Cache data for instant loading next time
+  Future<void> _cacheData({
+    required dynamic siteInfoResponse,
+    required dynamic homepageResponse,
+    required List<dynamic> categories,
+    required List<dynamic> featuredProducts,
+    required List<dynamic> saleProducts,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Save cache version
+      const currentCacheVersion = 2;
+      await prefs.setInt('cache_version', currentCacheVersion);
+      
+      // Cache homepage
+      final homepage = homepageResponse as ApiResponse<Post>;
+      if (homepage.isSuccess && homepage.data != null) {
+        await prefs.setString('cached_homepage', jsonEncode(homepage.data!.toJson()));
+      }
+      
+      // Cache categories (convert WooCategory objects to simple maps with image)
+      final categoriesJson = categories.map((cat) {
+        return {
+          'id': cat.id,
+          'name': cat.name,
+          'slug': cat.slug,
+          'description': cat.description,
+          'count': cat.count,
+          'image': cat.image != null ? {
+            'id': cat.image!.id,
+            'src': cat.image!.src,
+          } : null,
+        };
+      }).toList();
+      await prefs.setString('cached_categories', jsonEncode(categoriesJson));
+      
+      // Cache featured products (convert WooProduct objects to simple maps)
+      final featuredJson = featuredProducts.map((product) {
+        return {
+          'id': product.id,
+          'name': product.name,
+          'price': product.price,
+          'images': product.images.map((img) => {
+            'id': img.id,
+            'src': img.src,
+            'name': img.name,
+          }).toList(),
+          'on_sale': product.onSale,
+          'sale_price': product.salePrice,
+          'regular_price': product.regularPrice,
+        };
+      }).toList();
+      await prefs.setString('cached_featured_products', jsonEncode(featuredJson));
+      
+      // Cache sale products
+      final saleJson = saleProducts.map((product) {
+        return {
+          'id': product.id,
+          'name': product.name,
+          'price': product.price,
+          'images': product.images.map((img) => {
+            'id': img.id,
+            'src': img.src,
+            'name': img.name,
+          }).toList(),
+          'on_sale': product.onSale,
+          'sale_price': product.salePrice,
+          'regular_price': product.regularPrice,
+        };
+      }).toList();
+      await prefs.setString('cached_sale_products', jsonEncode(saleJson));
+      
+      // Cache site info
+      final siteInfo = siteInfoResponse as ApiResponse<SiteInfo>;
+      if (siteInfo.isSuccess && siteInfo.data != null) {
+        await prefs.setString('cached_site_info', jsonEncode(siteInfo.data!.toJson()));
+      }
+      
+      // Cache contact info
+      final contactInfo = {
+        'social_links': _socialLinks,
+        'phone': _contactPhone,
+        'email': _contactEmail,
+        'address': _contactAddress,
+      };
+      await prefs.setString('cached_contact_info', jsonEncode(contactInfo));
+      
+      print('💾 [CACHE] All data cached successfully');
+    } catch (e) {
+      print('⚠️ [CACHE] Error caching data: $e');
+    }
+  }
+
+  Future<void> _loadHomePageContent_OLD() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final totalStartTime = DateTime.now();
+      print('🚀 [PERFORMANCE] Starting to load home page content...');
+      
+      // ⚡ OPTIMIZATION: Load ALL data in PARALLEL using Future.wait
+      final results = await Future.wait([
+        _wpService.getSiteInfo(),           // 0
+        _wpService.getPage(214),            // 1 - Homepage
+        _wooService.getCategories(),        // 2
+        _wooService.getFeaturedProducts(perPage: 8),  // 3
+        _wooService.getSaleProducts(perPage: 8),      // 4
+        _wpService.getPage(807),            // 5 - Contact page
+      ]);
+      
+      print('✅ [PERFORMANCE] All API calls completed in parallel: ${DateTime.now().difference(totalStartTime).inMilliseconds}ms');
+      
+      // Extract results (Future.wait returns List<dynamic>, so we need proper type handling)
+      final siteInfoResponse = results[0];
+      final homepageResponse = results[1];
+      final categories = results[2] as List<dynamic>;
+      final featuredProducts = results[3] as List<dynamic>;
+      final saleProducts = results[4] as List<dynamic>;
+      final contactPageResponse = results[5];
+      
+      // Extract contact page info
+      try {
+        final contactResponse = contactPageResponse as ApiResponse<Post>;
+        if (contactResponse.isSuccess && contactResponse.data != null) {
+          final htmlStart = DateTime.now();
+          final pageHtml = await http.get(Uri.parse(contactResponse.data!.url));
+          print('⏱️ [PERFORMANCE] HTML content fetched in ${DateTime.now().difference(htmlStart).inMilliseconds}ms');
+          
+          if (pageHtml.statusCode == 200) {
+            final htmlContent = pageHtml.body;
+            _socialLinks = _extractSocialLinks(htmlContent);
+            _contactPhone = _extractPhone(htmlContent);
+            _contactEmail = _extractEmail(htmlContent);
+            _contactAddress = _extractAddress(htmlContent);
+          }
+        }
+      } catch (e) {
+        print('⚠️ [PERFORMANCE] Contact page extraction failed: $e');
+        // Use defaults if extraction fails
+        _socialLinks = {};
+        _contactPhone = '+971566810269';
+        _contactEmail = 'info@alkhatm.com';
+        _contactAddress = 'Al Khatm Gents Tailoring LLC, Exhibition showroom no: 47, Ajman industrial-1, UAE';
+      }
+      
+      print('✅ [PERFORMANCE] TOTAL loading time: ${DateTime.now().difference(totalStartTime).inMilliseconds}ms (${DateTime.now().difference(totalStartTime).inSeconds}s)');
 
       setState(() {
         // Site info
-        if (siteInfoResponse.isSuccess) {
-          _siteInfo = siteInfoResponse.data;
+        final siteInfo = siteInfoResponse as ApiResponse<SiteInfo>;
+        if (siteInfo.isSuccess) {
+          _siteInfo = siteInfo.data;
         }
 
         // Homepage content - Load page ID 214 directly
-        if (homepageResponse.isSuccess && homepageResponse.data != null) {
-          _homepage = homepageResponse.data;
+        final homepage = homepageResponse as ApiResponse<Post>;
+        if (homepage.isSuccess && homepage.data != null) {
+          _homepage = homepage.data;
         }
 
         // Categories
@@ -855,19 +1183,43 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
             itemCount: displayCategories.length,
             itemBuilder: (context, index) {
               final category = displayCategories[index];
-              final imageUrl = category.image?.src ?? _getCategoryImage(category.name);
+              
+              // Handle both WooCategory objects and cached Map data
+              String? imageUrl;
+              String categoryName;
+              int categoryId;
+              int categoryCount;
+              
+              if (category is Map) {
+                // Cached data (Map format)
+                categoryName = category['name']?.toString() ?? '';
+                categoryId = category['id'] is int ? category['id'] : int.tryParse(category['id']?.toString() ?? '0') ?? 0;
+                categoryCount = category['count'] is int ? category['count'] : int.tryParse(category['count']?.toString() ?? '0') ?? 0;
+                
+                // Get image from cached data or fallback
+                if (category['image'] != null && category['image'] is Map) {
+                  imageUrl = category['image']['src']?.toString();
+                }
+                imageUrl ??= _getCategoryImage(categoryName);
+              } else {
+                // Live data (WooCategory object)
+                categoryName = category.name;
+                categoryId = category.id;
+                categoryCount = category.count;
+                imageUrl = category.image?.src ?? _getCategoryImage(category.name);
+              }
               
               return CategoryCard(
-                name: category.name,
+                name: categoryName,
                 imageUrl: imageUrl,
-                count: category.count,
+                count: categoryCount,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => CategoryProductsScreen(
-                        categoryId: category.id.toString(),
-                        categoryName: category.name,
+                        categoryId: categoryId.toString(),
+                        categoryName: categoryName,
                       ),
                     ),
                   );
@@ -920,20 +1272,60 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
           itemCount: _featuredProducts.length > 4 ? 4 : _featuredProducts.length,
           itemBuilder: (context, index) {
             final product = _featuredProducts[index];
+            
+            // Handle both WooProduct objects and cached Map data
+            String productName;
+            String productPrice;
+            String? originalPrice;
+            String? imageUrl;
+            bool isOnSale;
+            double rating;
+            int ratingCount;
+            int productId;
+            
+            if (product is Map) {
+              // Cached data (Map format)
+              productName = product['name']?.toString() ?? '';
+              productPrice = product['price']?.toString() ?? '0';
+              isOnSale = product['on_sale'] == true || product['on_sale'] == 'true';
+              originalPrice = isOnSale ? product['regular_price']?.toString() : null;
+              productId = product['id'] is int ? product['id'] : int.tryParse(product['id']?.toString() ?? '0') ?? 0;
+              rating = 0.0; // Cached data doesn't include rating
+              ratingCount = 0;
+              
+              // Get first image from cached data
+              if (product['images'] != null && product['images'] is List && (product['images'] as List).isNotEmpty) {
+                final firstImage = (product['images'] as List).first;
+                imageUrl = firstImage['src']?.toString();
+              } else {
+                imageUrl = null;
+              }
+            } else {
+              // Live data (WooProduct object)
+              productName = product.name;
+              productPrice = product.price;
+              isOnSale = product.onSale;
+              originalPrice = isOnSale ? product.regularPrice : null;
+              productId = product.id;
+              rating = product.averageRating;
+              ratingCount = product.ratingCount;
+              imageUrl = product.images.isNotEmpty ? product.images.first.src : null;
+            }
+            
             return ProductCard(
-              name: product.name,
-              price: 'د.إ ${product.price}',
-              originalPrice: product.onSale ? 'د.إ ${product.regularPrice}' : null,
-              imageUrl: product.images.isNotEmpty ? product.images.first.src : null,
-              onSale: product.onSale,
-              rating: product.averageRating,
-              ratingCount: product.ratingCount,
+              name: productName,
+              price: 'د.إ $productPrice',
+              originalPrice: originalPrice != null ? 'د.إ $originalPrice' : null,
+              imageUrl: imageUrl,
+              onSale: isOnSale,
+              rating: rating,
+              ratingCount: ratingCount,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ProductDetailScreen(
-                      productId: product.id,
+                      productId: productId,
                     ),
                   ),
                 );
@@ -968,23 +1360,60 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
             itemCount: _saleProducts.length,
             itemBuilder: (context, index) {
               final product = _saleProducts[index];
+              
+              // Handle both WooProduct objects and cached Map data
+              String productName;
+              String productPrice;
+              String originalPrice;
+              String? imageUrl;
+              double rating;
+              int ratingCount;
+              int productId;
+              
+              if (product is Map) {
+                // Cached data (Map format)
+                productName = product['name']?.toString() ?? '';
+                productPrice = product['price']?.toString() ?? '0';
+                originalPrice = product['regular_price']?.toString() ?? '0';
+                productId = product['id'] is int ? product['id'] : int.tryParse(product['id']?.toString() ?? '0') ?? 0;
+                rating = 0.0; // Cached data doesn't include rating
+                ratingCount = 0;
+                
+                // Get first image from cached data
+                if (product['images'] != null && product['images'] is List && (product['images'] as List).isNotEmpty) {
+                  final firstImage = (product['images'] as List).first;
+                  imageUrl = firstImage['src']?.toString();
+                } else {
+                  imageUrl = null;
+                }
+              } else {
+                // Live data (WooProduct object)
+                productName = product.name;
+                productPrice = product.price;
+                originalPrice = product.regularPrice;
+                productId = product.id;
+                rating = product.averageRating;
+                ratingCount = product.ratingCount;
+                imageUrl = product.images.isNotEmpty ? product.images.first.src : null;
+              }
+              
               return Container(
                 width: 160,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 child: ProductCard(
-                  name: product.name,
-                  price: 'د.إ ${product.price}',
-                  originalPrice: 'د.إ ${product.regularPrice}',
-                  imageUrl: product.images.isNotEmpty ? product.images.first.src : null,
-                  rating: product.averageRating,
-                  ratingCount: product.ratingCount,
+                  name: productName,
+                  price: 'د.إ $productPrice',
+                  originalPrice: 'د.إ $originalPrice',
+                  imageUrl: imageUrl,
+                  rating: rating,
+                  ratingCount: ratingCount,
                   onSale: true,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ProductDetailScreen(
-                          productId: product.id,
+                          productId: productId,
                         ),
                       ),
                     );

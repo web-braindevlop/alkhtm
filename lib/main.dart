@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'screens/main_screen.dart';
 import 'services/apns_service.dart';
 
@@ -10,8 +10,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
-    // Initialize APNs only for iOS (not web)
-    if (!kIsWeb) {
+    // Initialize APNs only for iOS (not web or Android)
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
       await APNsService.initialize();
     }
   } catch (e) {
@@ -26,10 +26,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      title: 'AL KHATM',
-      debugShowCheckedModeBanner: false,
+    return MediaQuery(
+      data: MediaQueryData.fromView(View.of(context)).copyWith(
+        textScaleFactor: 1.0, // Disable device font scaling
+      ),
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        title: 'AL KHATM',
+        debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1976D2)),
         useMaterial3: true,
@@ -57,6 +61,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: MainScreen(key: mainScreenKey),
+      ),
     );
   }
 }

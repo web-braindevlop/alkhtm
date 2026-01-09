@@ -79,6 +79,26 @@ class WooProduct {
           [],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'slug': slug,
+      'description': description,
+      'short_description': shortDescription,
+      'price': price,
+      'regular_price': regularPrice,
+      'sale_price': salePrice,
+      'on_sale': onSale,
+      'images': images.map((img) => img.toJson()).toList(),
+      'categories': categories.map((cat) => cat.toJson()).toList(),
+      'stock_status': inStock ? 'instock' : 'outofstock',
+      'average_rating': averageRating.toString(),
+      'rating_count': ratingCount,
+      'related_ids': relatedIds,
+    };
+  }
 }
 
 class ProductImage {
@@ -99,6 +119,14 @@ class ProductImage {
       name: json['name']?.toString() ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'src': src,
+      'name': name,
+    };
+  }
 }
 
 class ProductCategory {
@@ -118,6 +146,14 @@ class ProductCategory {
       name: json['name']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'slug': slug,
+    };
   }
 }
 
@@ -189,8 +225,11 @@ class WooCommerceService {
 
       final url = _buildBridgeUrl('woo_products', params);
       final uri = Uri.parse(url);
+      print('📡 [API] Calling getProducts: $url');
+      final startTime = DateTime.now();
       
       final response = await http.get(uri).timeout(ApiConfig.timeout);
+      print('✓ [API] getProducts response received in ${DateTime.now().difference(startTime).inMilliseconds}ms');
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -237,8 +276,11 @@ class WooCommerceService {
       
       final url = _buildBridgeUrl('woo_categories', params);
       final uri = Uri.parse(url);
+      print('📡 [API] Calling getCategories: $url');
+      final startTime = DateTime.now();
       
       final response = await http.get(uri).timeout(ApiConfig.timeout);
+      print('✓ [API] getCategories response received in ${DateTime.now().difference(startTime).inMilliseconds}ms');
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);

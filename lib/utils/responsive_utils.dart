@@ -152,4 +152,13 @@ class ResponsiveUtils {
     // Mobile
     return 0.7;
   }
+  
+  // Get responsive font size that respects user's device text scaling
+  // Clamps textScaleFactor between 0.8 and 1.3 to prevent UI breaking
+  static double getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    // Clamp to reasonable range for better UX (0.8-1.3)
+    final clampedScale = textScaleFactor.clamp(0.8, 1.3);
+    return baseFontSize * clampedScale;
+  }
 }

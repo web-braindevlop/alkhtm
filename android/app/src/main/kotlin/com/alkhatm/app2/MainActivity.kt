@@ -1,4 +1,4 @@
-package com.example.alkhatm
+package com.alkhatm.app2
 
 import io.flutter.embedding.android.FlutterActivity
 

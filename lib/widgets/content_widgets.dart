@@ -656,9 +656,9 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Product Image
+            // Product Image - Flexible to allow space for info below
             Expanded(
-              flex: 3,
+              flex: 5,
               child: Stack(
                 children: [
                   imageUrl != null
@@ -666,6 +666,7 @@ class ProductCard extends StatelessWidget {
                           imageUrl: imageUrl!,
                           fit: BoxFit.cover,
                           width: double.infinity,
+                          height: double.infinity,
                           placeholder: (context, url) => Container(
                             color: Colors.grey[300],
                             child: const Center(child: CircularProgressIndicator()),
@@ -706,62 +707,65 @@ class ProductCard extends StatelessWidget {
               ),
             ),
 
-            // Product Info
+            // Product Info - Expanded to take remaining space, ensuring price is always visible
             Expanded(
-              flex: 2,
+              flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    // Top section: Product Name + Rating
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Star Rating - Always show even if no ratings
+                        // Product Name - Limited to 2 lines
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        
+                        // Star Rating - Fixed space
                         if (rating != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: StarRating(
-                              rating: rating!,
-                              ratingCount: ratingCount ?? 0,
-                              size: 12,
-                              showCount: false,
+                          StarRating(
+                            rating: rating!,
+                            ratingCount: ratingCount ?? 0,
+                            size: 12,
+                            showCount: false,
+                          ),
+                      ],
+                    ),
+                    
+                    // Bottom section: Price - Fixed at bottom
+                    Wrap(
+                      spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          price,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: onSale ? Colors.red : Colors.black,
+                          ),
+                        ),
+                        if (originalPrice != null)
+                          Text(
+                            originalPrice!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.grey[600],
                             ),
                           ),
-                        // Price
-                        Row(
-                          children: [
-                            Text(
-                              price,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: onSale ? Colors.red : Colors.black,
-                              ),
-                            ),
-                            if (originalPrice != null) ...[
-                              const SizedBox(width: 8),
-                              Text(
-                                originalPrice!,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
                       ],
                     ),
                   ],

@@ -21,6 +21,8 @@ class _ShopScreenState extends State<ShopScreen> {
   List<dynamic> _products = [];
   bool _isLoading = true;
   String _errorMessage = '';
+  String _currentSearchQuery = ''; // Track current search query
+  bool _isSearchMode = false; // Track if we're in search mode
 
   @override
   void initState() {
@@ -32,6 +34,8 @@ class _ShopScreenState extends State<ShopScreen> {
     setState(() {
       _isLoading = true;
       _errorMessage = '';
+      _isSearchMode = false; // Not in search mode
+      _currentSearchQuery = ''; // Clear search query
     });
 
     try {
@@ -53,14 +57,16 @@ class _ShopScreenState extends State<ShopScreen> {
     return Scaffold(
       key: widget.scaffoldKey,
       appBar: AppBar(
-        title: const Text('Shop'),
+        title: _isSearchMode 
+            ? Text('Search: $_currentSearchQuery')
+            : const Text('Shop'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implement search
-            },
-          ),
+          if (_isSearchMode)
+            IconButton(
+              icon: const Icon(Icons.clear),
+              tooltip: 'Clear search',
+              onPressed: _loadProducts, // Load all products again
+            ),
         ],
       ),
       drawer: const AppDrawer(),
@@ -113,7 +119,7 @@ class _ShopScreenState extends State<ShopScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: _loadProducts,
+      onRefresh: _handleRefresh,
       child: GridView.builder(
         padding: ResponsiveUtils.getScreenPadding(context),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -152,5 +158,93 @@ class _ShopScreenState extends State<ShopScreen> {
         },
       ),
     );
+  }
+
+  // Show search dialog
+  void _showSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String searchQuery = '';
+        return AlertDialog(
+          title: const Text('Search Products'),
+          content: TextField(
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'Enter product name...',
+              prefixIcon: Icon(Icons.search),
+            ),
+            onChanged: (value) {
+              searchQuery = value;
+            },
+            onSubmitted: (value) {
+              if (value.isNotEmpty) {
+                Navigator.of(context).pop();
+                _performSearch(value);
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (searchQuery.isNotEmpty) {
+                  Navigator.of(context).pop();
+                  _performSearch(searchQuery);
+                }
+              },
+              child: const Text('Search'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Perform search
+  Future<void> _performSearch(String query) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+      _isSearchMode = true; // Entering search mode
+      _currentSearchQuery = query; // Save the search query
+    });
+
+    try {
+      print('🔍 [SEARCH] Searching for: "$query"');
+      final results = await _wooService.searchProducts(query);
+      print('✅ [SEARCH] Found ${results.length} results for "$query"');
+      
+      setState(() {
+        _products = results;
+        _isLoading = false;
+      });
+      
+      if (results.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No products found for "$query"')),
+        );
+      }
+    } catch (e) {
+      print('❌ [SEARCH] Error: $e');
+      setState(() {
+        _errorMessage = 'Search error: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Handle refresh - respects search mode
+  Future<void> _handleRefresh() async {
+    if (_isSearchMode && _currentSearchQuery.isNotEmpty) {
+      // Re-run the search
+      await _performSearch(_currentSearchQuery);
+    } else {
+      // Load all products
+      await _loadProducts();
+    }
   }
 }

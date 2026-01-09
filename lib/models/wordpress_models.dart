@@ -68,6 +68,28 @@ class Post {
           : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'excerpt': excerpt,
+      'slug': slug,
+      'status': status,
+      'type': type,
+      'date': date.toIso8601String(),
+      'modified': modified.toIso8601String(),
+      'author': author.toJson(),
+      'featured_image': featuredImage?.toJson(),
+      'first_content_image': firstContentImage,
+      'categories': categories.map((c) => c.toJson()).toList(),
+      'tags': tags.map((t) => t.toJson()).toList(),
+      'url': url,
+      'comment_count': commentCount,
+      'comments': comments?.map((c) => c.toJson()).toList(),
+    };
+  }
 }
 
 class Author {
@@ -87,6 +109,14 @@ class Author {
       name: json['name']?.toString() ?? 'Unknown',
       avatar: json['avatar']?.toString() ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'avatar': avatar,
+    };
   }
 }
 
@@ -110,6 +140,15 @@ class FeaturedImage {
       medium: json['medium'] ?? '',
       large: json['large'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'full': full,
+      'thumbnail': thumbnail,
+      'medium': medium,
+      'large': large,
+    };
   }
 }
 
@@ -140,6 +179,17 @@ class Category {
       parent: json['parent'] is int ? json['parent'] : int.tryParse(json['parent']?.toString() ?? '0'),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'slug': slug,
+      'description': description,
+      'count': count,
+      'parent': parent,
+    };
+  }
 }
 
 class Tag {
@@ -159,6 +209,14 @@ class Tag {
       name: json['name']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'slug': slug,
+    };
   }
 }
 
@@ -194,6 +252,19 @@ class Comment {
       date: DateTime.parse(json['date'] ?? DateTime.now().toString()),
       avatar: json['avatar'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'post_id': postId,
+      'post_title': postTitle,
+      'author': author,
+      'email': email,
+      'content': content,
+      'date': date.toIso8601String(),
+      'avatar': avatar,
+    };
   }
 }
 
@@ -334,5 +405,19 @@ class SiteInfo {
       theme: json['theme'] ?? '',
       timezone: json['timezone'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'url': url,
+      'admin_email': adminEmail,
+      'language': language,
+      'charset': charset,
+      'version': version,
+      'theme': theme,
+      'timezone': timezone,
+    };
   }
 }

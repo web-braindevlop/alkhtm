@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import '../services/apns_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,7 +27,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = await APNsService.getDeviceToken();
+    // Only get token on iOS
+    final token = defaultTargetPlatform == TargetPlatform.iOS 
+        ? await APNsService.getDeviceToken() 
+        : null;
     
     setState(() {
       _generalNotifications = prefs.getBool('notif_general') ?? true;

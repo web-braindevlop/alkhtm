@@ -9,9 +9,12 @@ class WordPressService {
   Future<ApiResponse<SiteInfo>> getSiteInfo() async {
     try {
       final url = ApiConfig.buildUrl(ApiConfig.siteInfo);
+      print('📡 [API] Calling: $url');
+      final startTime = DateTime.now();
       final response = await http
           .get(Uri.parse(url))
           .timeout(ApiConfig.timeout);
+      print('✓ [API] Response received in ${DateTime.now().difference(startTime).inMilliseconds}ms');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -49,9 +52,12 @@ class WordPressService {
       };
 
       final url = ApiConfig.buildUrl(ApiConfig.posts, params: params);
+      print('📡 [API] Calling: $url');
+      final startTime = DateTime.now();
       final response = await http
           .get(Uri.parse(url))
           .timeout(ApiConfig.timeout);
+      print('✓ [API] Response received in ${DateTime.now().difference(startTime).inMilliseconds}ms');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -171,9 +177,12 @@ class WordPressService {
   Future<ApiResponse<Post>> getPage(int id) async {
     try {
       final url = ApiConfig.buildUrl(ApiConfig.page, params: {'id': id});
+      print('📡 [API] Calling getPage($id): $url');
+      final startTime = DateTime.now();
       final response = await http
           .get(Uri.parse(url))
           .timeout(ApiConfig.timeout);
+      print('✓ [API] getPage($id) response received in ${DateTime.now().difference(startTime).inMilliseconds}ms');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
