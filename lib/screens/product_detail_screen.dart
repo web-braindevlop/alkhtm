@@ -26,6 +26,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   List<WooProduct> _relatedProducts = [];
   bool _isLoadingRelated = false;
+  
+  // Variation selection state
+  Map<String, String> _selectedAttributes = {};
+  ProductVariation? _selectedVariation;
+  String _displayPrice = '';
 
   @override
   void initState() {
@@ -71,6 +76,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     setState(() {
       _product = product;
       _isLoading = false;
+      
+      // Initialize variation selection for variable products
+      if (product != null && product.isVariable) {
+        _displayPrice = product.price;
+        print('🎨 [VARIATION] Variable product loaded: ${product.name}');
+        print('🎨 [VARIATION] ${product.variations.length} variations available');
+        print('🎨 [VARIATION] ${product.attributes.length} attributes (Size, Color, etc.)');
+        
+        // Log all attributes
+        for (var attr in product.attributes) {
+          print('   - ${attr.name}: ${attr.options.map((o) => o.name).join(", ")}');
+        }
+      }
     });
 
     // Cache the product for next time
@@ -147,21 +165,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 const SizedBox(height: 12),
 
-                // Price
+                // Price (shows selected variation price if available)
                 Row(
                   children: [
                     Text(
-                      'د.إ ${_product!.price}',
+                      'د.إ ${_selectedVariation?.price ?? _product!.price}',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: _product!.onSale ? Colors.red : Colors.black,
+                        color: (_selectedVariation?.onSale ?? _product!.onSale) ? Colors.red : Colors.black,
                       ),
                     ),
-                    if (_product!.onSale && _product!.regularPrice.isNotEmpty) ...[
+                    if ((_selectedVariation?.onSale ?? _product!.onSale) && 
+                        (_selectedVariation?.regularPrice ?? _product!.regularPrice).isNotEmpty) ...[
                       const SizedBox(width: 12),
                       Text(
-                        'د.إ ${_product!.regularPrice}',
+                        'د.إ ${_selectedVariation?.regularPrice ?? _product!.regularPrice}',
                         style: TextStyle(
                           fontSize: 18,
                           decoration: TextDecoration.lineThrough,
@@ -174,24 +193,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 const SizedBox(height: 8),
 
-                // Stock Status
+                // Stock Status (shows selected variation stock if available)
                 Row(
                   children: [
                     Icon(
-                      _product!.inStock ? Icons.check_circle : Icons.cancel,
-                      color: _product!.inStock ? Colors.green : Colors.red,
+                      (_selectedVariation?.inStock ?? _product!.inStock) ? Icons.check_circle : Icons.cancel,
+                      color: (_selectedVariation?.inStock ?? _product!.inStock) ? Colors.green : Colors.red,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      _product!.inStock ? 'In Stock' : 'Out of Stock',
+                      (_selectedVariation?.inStock ?? _product!.inStock) ? 'In Stock' : 'Out of Stock',
                       style: TextStyle(
-                        color: _product!.inStock ? Colors.green : Colors.red,
+                        color: (_selectedVariation?.inStock ?? _product!.inStock) ? Colors.green : Colors.red,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
+
+                const SizedBox(height: 24),
+
+                // Variation Selector (Size, Color, etc.)
+                if (_product!.isVariable) ..._buildVariationSelector(),
 
                 const SizedBox(height: 24),
 
@@ -300,8 +324,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return _ReviewsSection(productId: _product!.id);
   }
 
+  // Get current images (variation images if selected, otherwise product images)
+  List<ProductImage> _getCurrentImages() {
+    // If variation selected and has images, use variation images
+    if (_selectedVariation != null && 
+        _selectedVariation!.id > 0 && 
+        _selectedVariation!.images.isNotEmpty) {
+      return _selectedVariation!.images;
+    }
+    // Otherwise use product images
+    return _product?.images ?? [];
+  }
+
   Widget _buildImageGallery() {
-    final images = _product!.images;
+    final images = _getCurrentImages();
     if (images.isEmpty) {
       return Container(
         height: 400,
@@ -421,7 +457,227 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  // Build variation selector UI (Size, Color, etc.)
+  List<Widget> _buildVariationSelector() {
+    if (_product == null || !_product!.isVariable || _product!.attributes.isEmpty) {
+      return [];
+    }
+
+    print('🎨 [UI] Building variation selector with ${_product!.attributes.length} attributes');
+
+    List<Widget> widgets = [];
+
+    // Add selector for each attribute
+    for (var attribute in _product!.attributes) {
+      widgets.add(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Attribute Name (e.g., "Size:", "Color:")
+            Text(
+              '${attribute.name}:',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            // Options (e.g., Small, Medium, Large OR Black, Blue for colors)
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: attribute.options.map((option) {
+                final isSelected = _selectedAttributes[attribute.slug] == option.slug;
+                
+                // For color attributes, use actual color as background
+                if (attribute.isColor && option.color != null) {
+                  Color? chipColor;
+                  Color textColor = Colors.black;
+                  
+                  try {
+                    chipColor = Color(int.parse(option.color!.replaceFirst('#', '0xFF')));
+                    // Calculate brightness for text contrast
+                    final brightness = chipColor.computeLuminance();
+                    textColor = brightness > 0.5 ? Colors.black : Colors.white;
+                  } catch (e) {
+                    print('⚠️ [COLOR] Invalid color value: ${option.color}');
+                  }
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedAttributes[attribute.slug] = option.slug;
+                        print('✅ [SELECTION] ${attribute.name}: ${option.name} (Color: ${option.color})');
+                        print('🎨 [COLOR] Applied background color ${option.color} to button');
+                        _updateSelectedVariation();
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: chipColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected ? Colors.white : Colors.grey[300]!,
+                          width: isSelected ? 3 : 1,
+                        ),
+                        boxShadow: isSelected ? [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ] : null,
+                      ),
+                      child: Text(
+                        option.name,
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                
+                // For non-color attributes (Size, etc.), use regular ChoiceChip
+                return ChoiceChip(
+                  label: Text(option.name),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() {
+                        _selectedAttributes[attribute.slug] = option.slug;
+                        print('✅ [SELECTION] ${attribute.name}: ${option.name}');
+                        _updateSelectedVariation();
+                      });
+                    }
+                  },
+                  selectedColor: Colors.blue,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      );
+    }
+
+    // Only show warning if invalid combination selected
+    if (_product!.isVariable && 
+        _selectedAttributes.isNotEmpty && 
+        _selectedAttributes.length == _product!.attributes.length &&
+        _selectedVariation == null) {
+      // Some attributes selected but variation not found
+      widgets.add(
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.orange[50],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.orange),
+          ),
+          child: const Row(
+            children: [
+              Icon(Icons.warning, color: Colors.orange, size: 20),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'This combination is not available. Please select different options.',
+                  style: TextStyle(color: Colors.orange, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return widgets;
+  }
+
+  // Find matching variation based on selected attributes
+  void _updateSelectedVariation() {
+    if (_product == null || !_product!.isVariable) return;
+
+    // Check if all attributes are selected
+    final allSelected = _product!.attributes.every(
+      (attr) => _selectedAttributes.containsKey(attr.slug)
+    );
+
+    if (!allSelected) {
+      setState(() {
+        _selectedVariation = null;
+      });
+      print('⚠️ [VARIATION] Not all attributes selected yet');
+      return;
+    }
+
+    // Find matching variation
+    _selectedVariation = _product!.variations.firstWhere(
+      (variation) {
+        // Check if all attributes match
+        return _selectedAttributes.entries.every((entry) {
+          final attrKey = 'attribute_${entry.key}';
+          return variation.attributes[attrKey] == entry.value;
+        });
+      },
+      orElse: () => ProductVariation(
+        id: 0,
+        sku: '',
+        price: '0',
+        regularPrice: '0',
+        salePrice: '',
+        onSale: false,
+        stockStatus: 'outofstock',
+        attributes: {},
+        images: [],
+        inStock: false,
+        isPurchasable: false,
+      ), // Return a dummy variation if not found
+    );
+
+    if (_selectedVariation != null && _selectedVariation!.id > 0) {
+      print('✅ [VARIATION] Matched variation ID: ${_selectedVariation!.id}');
+      print('   Price: ${_selectedVariation!.price}');
+      print('   Stock: ${_selectedVariation!.stockStatus}');
+      
+      // Handle image switching for variation
+      if (_selectedVariation!.images.isNotEmpty) {
+        print('🖼️ [IMAGE] Switching to variation images (${_selectedVariation!.images.length} images)');
+        for (var i = 0; i < _selectedVariation!.images.length; i++) {
+          print('   Image ${i + 1}: ${_selectedVariation!.images[i].src}');
+        }
+        // Reset image index to show first variation image
+        _currentImageIndex = 0;
+      } else {
+        print('🖼️ [IMAGE] Variation has no specific images, using product images');
+      }
+    } else {
+      print('❌ [VARIATION] No matching variation found for selected attributes');
+      _selectedVariation = null;
+      // Reset to product images
+      _currentImageIndex = 0;
+      print('🖼️ [IMAGE] Reset to product images');
+    }
+
+    setState(() {});
+  }
+
   Widget _buildBottomBar() {
+    // Check if all required attributes are selected for variable products
+    final bool allAttributesSelected = !_product!.isVariable || 
+        (_product!.attributes.every((attr) => _selectedAttributes.containsKey(attr.slug)));
+    
+    // For variable products, button is disabled until all attributes selected
+    final bool canAddToCart = allAttributesSelected && (_selectedVariation?.inStock ?? _product!.inStock);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -438,7 +694,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: _product!.inStock
+              onPressed: canAddToCart
                   ? () async {
                       await _addToCart();
                       if (mounted) {
@@ -449,9 +705,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             action: SnackBarAction(
                               label: 'View Cart',
                               onPressed: () {
-                                // Pop current screen and switch to cart tab
-                                Navigator.of(context).pop();
+                                // Switch to cart tab first, then pop
                                 mainScreenKey.currentState?.switchToTab(2);
+                                Future.delayed(const Duration(milliseconds: 100), () {
+                                  if (mounted) {
+                                    Navigator.of(context).pop();
+                                  }
+                                });
                               },
                             ),
                           ),
@@ -469,17 +729,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: _product!.inStock
+            onPressed: canAddToCart
                 ? () async {
                     await _addToCart();
                     if (mounted) {
-                      // Pop current screen and switch to checkout
-                      Navigator.of(context).pop();
+                      // Switch to cart tab first
                       mainScreenKey.currentState?.switchToTab(2);
-                      // Navigate to checkout after a small delay
-                      Future.delayed(const Duration(milliseconds: 300), () {
+                      // Pop current screen after switching tabs
+                      Future.delayed(const Duration(milliseconds: 100), () {
                         if (mounted) {
-                          mainScreenKey.currentState?.goToCheckout();
+                          Navigator.of(context).pop();
+                          // Navigate to checkout after pop completes
+                          Future.delayed(const Duration(milliseconds: 200), () {
+                            mainScreenKey.currentState?.goToCheckout();
+                          });
                         }
                       });
                     }
@@ -500,25 +763,64 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _addToCart() async {
     if (_product == null) return;
 
+    // For variable products, require variation selection
+    if (_product!.isVariable) {
+      if (_selectedVariation == null) {
+        print('⚠️ [CART] Cannot add to cart - no variation selected');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please select product options (Size, Color, etc.)'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
+      print('✅ [CART] Adding variation ID ${_selectedVariation!.id} to cart');
+      print('   Attributes: ${_selectedAttributes}');
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final cartJson = prefs.getString('cart') ?? '[]';
     final List<dynamic> cart = json.decode(cartJson);
 
-    // Check if product already exists in cart
-    final existingIndex = cart.indexWhere((item) => item['id'] == _product!.id);
+    // For variable products, check by variation_id
+    final cartKey = _product!.isVariable && _selectedVariation != null 
+        ? 'variation_${_selectedVariation!.id}'
+        : 'product_${_product!.id}';
+    
+    final existingIndex = cart.indexWhere((item) => 
+      (_product!.isVariable && _selectedVariation != null)
+        ? (item['variation_id'] == _selectedVariation!.id)
+        : (item['id'] == _product!.id && item['variation_id'] == null)
+    );
 
     if (existingIndex >= 0) {
       // Increment quantity
       cart[existingIndex]['quantity'] = (cart[existingIndex]['quantity'] as int) + 1;
+      print('🛒 [CART] Increased quantity for $cartKey');
     } else {
       // Add new item
-      cart.add({
+      final cartItem = {
         'id': _product!.id,
         'name': _product!.name,
-        'price': _product!.price,
+        'price': _product!.isVariable && _selectedVariation != null 
+            ? _selectedVariation!.price 
+            : _product!.price,
         'image': _product!.images.isNotEmpty ? _product!.images.first.src : '',
         'quantity': 1,
-      });
+      };
+      
+      // Add variation info if applicable
+      if (_product!.isVariable && _selectedVariation != null) {
+        cartItem['variation_id'] = _selectedVariation!.id;
+        cartItem['attributes'] = _selectedAttributes;
+      }
+      
+      cart.add(cartItem);
+      print('🛒 [CART] Added new item: $cartKey');
     }
 
     await prefs.setString('cart', json.encode(cart));

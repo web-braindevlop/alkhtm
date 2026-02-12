@@ -1,0 +1,795 @@
+﻿{
+    "success": true,
+    "message": "Products retrieved successfully",
+    "data": {
+        "products": [
+            {
+                "id": 3350,
+                "name": "Rolf Taylor 100 ML",
+                "slug": "rolf-taylor-100-ml-2",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "",
+                "short_description": "VOLOUME : 100 ML",
+                "sku": "",
+                "price": "",
+                "regular_price": "",
+                "sale_price": "",
+                "on_sale": false,
+                "price_html": "",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 41,
+                        "name": "BUKHOOR",
+                        "slug": "bukhoor"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3352",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2025\/12\/ROLF-TAYLOR.png",
+                        "name": "ROLF TAYLOR",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/rolf-taylor-100-ml-2\/",
+                "date_created": "2026-01-28 12:48:12"
+            },
+            {
+                "id": 3398,
+                "name": "Arabic Foot Wear",
+                "slug": "arabic-foot-wear-2",
+                "type": "variable",
+                "status": "publish",
+                "featured": false,
+                "description": "",
+                "short_description": "",
+                "sku": "",
+                "price": "100",
+                "regular_price": "",
+                "sale_price": "",
+                "on_sale": false,
+                "price_html": "<span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>100.00<\/bdi><\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3455",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/Untitled-design.png",
+                        "name": "Untitled design",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/arabic-foot-wear-2\/",
+                "date_created": "2026-01-25 16:44:36"
+            },
+            {
+                "id": 3374,
+                "name": "HAMDANIYA",
+                "slug": "hamdaniya",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "",
+                "short_description": "UGEEEEH IJ EE E E",
+                "sku": "",
+                "price": "100",
+                "regular_price": "120",
+                "sale_price": "100",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>120.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;120.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>100.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;100.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 48,
+                        "name": "HAMDANIYA",
+                        "slug": "hamdaniya"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3375",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/Hamdaniyatelal_1024x1024@2x.jpg",
+                        "name": "Hamdaniyatelal_1024x1024@2x",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/hamdaniya\/",
+                "date_created": "2026-01-15 13:25:55"
+            },
+            {
+                "id": 3351,
+                "name": "ROLF TAYLOR 80 ML",
+                "slug": "rolf-taylor-100-ml",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "",
+                "short_description": "VOLUME : 100 ML",
+                "sku": "",
+                "price": "150",
+                "regular_price": "250",
+                "sale_price": "150",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>250.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;250.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>150.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;150.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 45,
+                        "name": "FRAGRANCES",
+                        "slug": "fragrances"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3352",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2025\/12\/ROLF-TAYLOR.png",
+                        "name": "ROLF TAYLOR",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/rolf-taylor-100-ml\/",
+                "date_created": "2025-12-26 14:39:25"
+            },
+            {
+                "id": 3343,
+                "name": "Rolf Taylor 100 ml",
+                "slug": "rolf-taylor",
+                "type": "simple",
+                "status": "publish",
+                "featured": true,
+                "description": "delivery with in 2 days",
+                "short_description": "Volume : 100 ML\r\n\r\ndelivery with in 2 days\r\n\r\n&nbsp;",
+                "sku": "",
+                "price": "160",
+                "regular_price": "200",
+                "sale_price": "160",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>200.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;200.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>160.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;160.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 45,
+                        "name": "FRAGRANCES",
+                        "slug": "fragrances"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3352",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2025\/12\/ROLF-TAYLOR.png",
+                        "name": "ROLF TAYLOR",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/rolf-taylor\/",
+                "date_created": "2025-12-25 13:15:14"
+            },
+            {
+                "id": 3161,
+                "name": "SHAWL DESIGN - 52",
+                "slug": "shawl-design-55",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SHAWL MADE FROM BEST QUALITY MATERIAL",
+                "short_description": "",
+                "sku": "",
+                "price": "105",
+                "regular_price": "135",
+                "sale_price": "105",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>135.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;135.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>105.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;105.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "5",
+                "rating_count": 2,
+                "categories": [
+                    {
+                        "id": 46,
+                        "name": "SHAWL",
+                        "slug": "shawl"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3428",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/CM4.png",
+                        "name": "CM4",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/shawl-design-55\/",
+                "date_created": "2024-08-15 10:34:12"
+            },
+            {
+                "id": 3147,
+                "name": "SHAWL PLAIN - 52",
+                "slug": "shawl-plain",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SHAWL MADE FROM BEST QUALITY MATERIAL",
+                "short_description": "",
+                "sku": "",
+                "price": "105",
+                "regular_price": "140",
+                "sale_price": "105",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>140.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;140.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>105.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;105.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 46,
+                        "name": "SHAWL",
+                        "slug": "shawl"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3429",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/CM5.png",
+                        "name": "CM5",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/shawl-plain\/",
+                "date_created": "2024-08-15 10:26:11"
+            },
+            {
+                "id": 3146,
+                "name": "BUKHOOR-MARYAM",
+                "slug": "bukhoor-maryam",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "THE SCENT OF BUKHOOR LINGERS LIKE A CHERISHED MEMORY",
+                "short_description": "",
+                "sku": "",
+                "price": "125",
+                "regular_price": "180",
+                "sale_price": "125",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>180.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;180.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>125.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;125.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 41,
+                        "name": "BUKHOOR",
+                        "slug": "bukhoor"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3118",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/BUKHOOR-CAT.png",
+                        "name": "BUKHOOR &#8211; CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/bukhoor-maryam\/",
+                "date_created": "2024-08-15 10:20:38"
+            },
+            {
+                "id": 3145,
+                "name": "BUKHOOR-SHARQIA",
+                "slug": "bukhoor-sharqia",
+                "type": "simple",
+                "status": "publish",
+                "featured": true,
+                "description": "THE SCENT OF BUKHOOR LINGERS LIKE A CHERISHED MEMORY",
+                "short_description": "",
+                "sku": "",
+                "price": "125",
+                "regular_price": "180",
+                "sale_price": "125",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>180.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;180.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>125.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;125.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "1",
+                "rating_count": 1,
+                "categories": [
+                    {
+                        "id": 41,
+                        "name": "BUKHOOR",
+                        "slug": "bukhoor"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3118",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/BUKHOOR-CAT.png",
+                        "name": "BUKHOOR &#8211; CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/bukhoor-sharqia\/",
+                "date_created": "2024-08-15 10:19:34"
+            },
+            {
+                "id": 3144,
+                "name": "BUKHOOR-OUD SIDRA",
+                "slug": "bukhoor-oud-sidra",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "THE SCENT OF BUKHOOR LINGERS LIKE A CHERISHED MEMORY",
+                "short_description": "",
+                "sku": "",
+                "price": "125",
+                "regular_price": "180",
+                "sale_price": "125",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>180.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;180.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>125.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;125.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 41,
+                        "name": "BUKHOOR",
+                        "slug": "bukhoor"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3118",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/BUKHOOR-CAT.png",
+                        "name": "BUKHOOR &#8211; CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/bukhoor-oud-sidra\/",
+                "date_created": "2024-08-15 10:18:05"
+            },
+            {
+                "id": 3108,
+                "name": "MENS SANDALROLF TAYLOR -6",
+                "slug": "mens-sandalrolf-taylor-6f2338wttn2338-6",
+                "type": "simple",
+                "status": "publish",
+                "featured": true,
+                "description": "SANDALS IN STYLE AND COLOR TO MATCH ANY OUTFIT ENGINEERED WITH OPTIMAL SUPPORT TO PROMOT BETTER POSTURE OF ITALIAN LATHER SANDALS MADE IN UAE",
+                "short_description": "",
+                "sku": "",
+                "price": "225",
+                "regular_price": "300",
+                "sale_price": "225",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>300.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;300.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>225.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;225.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "1.5",
+                "rating_count": 4,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3455",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/Untitled-design.png",
+                        "name": "Untitled design",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/mens-sandalrolf-taylor-6f2338wttn2338-6\/",
+                "date_created": "2024-08-15 08:37:04"
+            },
+            {
+                "id": 3104,
+                "name": "MENS SANDALROLF TAYLOR - 9F2300FLB2300-9",
+                "slug": "mens-sandalrolf-taylor-9f2300flb2300-9",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SANDALS IN STYLE AND COLOR TO MATCH ANY OUTFIT ENGINEERED WITH OPTIMAL SUPPORT TO PROMOT BETTER POSTURE OF ITALIAN LATHER SANDALS MADE IN UAE",
+                "short_description": "",
+                "sku": "",
+                "price": "225",
+                "regular_price": "300",
+                "sale_price": "225",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>300.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;300.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>225.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;225.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "3",
+                "rating_count": 1,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3446",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/2300-FLB-3-300x300-1.png",
+                        "name": "2300-FLB-3-300&#215;300",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/mens-sandalrolf-taylor-9f2300flb2300-9\/",
+                "date_created": "2024-08-15 08:37:04"
+            },
+            {
+                "id": 3102,
+                "name": "MENS SANDALROLF TAYLOR - 7F2300FLB2300-7",
+                "slug": "mens-sandalrolf-taylor-7f2300flb2300-7",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SANDALS IN STYLE AND COLOR TO MATCH ANY OUTFIT ENGINEERED WITH OPTIMAL SUPPORT TO PROMOT BETTER POSTURE OF ITALIAN LATHER SANDALS MADE IN UAE",
+                "short_description": "",
+                "sku": "",
+                "price": "225",
+                "regular_price": "300",
+                "sale_price": "225",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>300.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;300.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>225.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;225.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3455",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/Untitled-design.png",
+                        "name": "Untitled design",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/mens-sandalrolf-taylor-7f2300flb2300-7\/",
+                "date_created": "2024-08-15 08:37:04"
+            },
+            {
+                "id": 3100,
+                "name": "ROLF TAYLOR MENS SANDAL - 12F2300FGY2300-12",
+                "slug": "mens-sandalrolf-taylor-12f2300fgy2300-12",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SANDALS IN STYLE AND COLOR TO MATCH ANY OUTFIT ENGINEERED WITH OPTIMAL SUPPORT TO PROMOT BETTER POSTURE OF ITALIAN LATHER SANDALS MADE IN UAE",
+                "short_description": "",
+                "sku": "",
+                "price": "225",
+                "regular_price": "300",
+                "sale_price": "225",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>300.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;300.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>225.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;225.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3446",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/2300-FLB-3-300x300-1.png",
+                        "name": "2300-FLB-3-300&#215;300",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/mens-sandalrolf-taylor-12f2300fgy2300-12\/",
+                "date_created": "2024-08-15 08:37:04"
+            },
+            {
+                "id": 3099,
+                "name": "MENS SANDALROLF TAYLOR - 11F2300FGY2300-11",
+                "slug": "mens-sandalrolf-taylor-11f2300fgy2300-11",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SANDALS IN STYLE AND COLOR TO MATCH ANY OUTFIT ENGINEERED WITH OPTIMAL SUPPORT TO PROMOT BETTER POSTURE OF ITALIAN LATHER SANDALS MADE IN UAE",
+                "short_description": "",
+                "sku": "",
+                "price": "225",
+                "regular_price": "300",
+                "sale_price": "225",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>300.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;300.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>225.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;225.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3455",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/Untitled-design.png",
+                        "name": "Untitled design",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/mens-sandalrolf-taylor-11f2300fgy2300-11\/",
+                "date_created": "2024-08-15 08:37:04"
+            },
+            {
+                "id": 3098,
+                "name": "MENS SANDALROLF TAYLOR- 10F2300FGY2300-10",
+                "slug": "mens-sandalrolf-taylor-10f2300fgy2300-10",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "SANDALS IN STYLE AND COLOR TO MATCH ANY OUTFIT ENGINEERED WITH OPTIMAL SUPPORT TO PROMOT BETTER POSTURE OF ITALIAN LATHER SANDALS MADE IN UAE",
+                "short_description": "",
+                "sku": "",
+                "price": "225",
+                "regular_price": "300",
+                "sale_price": "225",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>300.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;300.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>225.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;225.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 47,
+                        "name": "SANDALS",
+                        "slug": "sandals"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3446",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2026\/01\/2300-FLB-3-300x300-1.png",
+                        "name": "2300-FLB-3-300&#215;300",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/mens-sandalrolf-taylor-10f2300fgy2300-10\/",
+                "date_created": "2024-08-15 08:37:04"
+            },
+            {
+                "id": 3063,
+                "name": "PERFUMEROLF TAYLOR100 ML",
+                "slug": "perfumerolf-taylor100-ml",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "PERFUME IS THE MOST INTENSE FORM OF MEMORY",
+                "short_description": "",
+                "sku": "",
+                "price": "198",
+                "regular_price": "264",
+                "sale_price": "198",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>264.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;264.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>198.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;198.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "1",
+                "rating_count": 3,
+                "categories": [
+                    {
+                        "id": 45,
+                        "name": "FRAGRANCES",
+                        "slug": "fragrances"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3119",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/FRAGRANCES-CAT.png",
+                        "name": "FRAGRANCES &#8211; CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/perfumerolf-taylor100-ml\/",
+                "date_created": "2024-08-15 08:37:00"
+            },
+            {
+                "id": 3059,
+                "name": "AGAL - BAIT AL ARABI - 56AC03307-56",
+                "slug": "agal-bait-al-arabi-56ac03307-56",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "BEST QUALITY AGAL TO BECOME PART OF PRESTIGE AND CONFORT",
+                "short_description": "",
+                "sku": "",
+                "price": "105",
+                "regular_price": "140",
+                "sale_price": "105",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>140.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;140.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>105.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;105.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "4",
+                "rating_count": 2,
+                "categories": [
+                    {
+                        "id": 44,
+                        "name": "AGAL",
+                        "slug": "agal"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3117",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/AGAL-CAT.png",
+                        "name": "AGAL- CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/agal-bait-al-arabi-56ac03307-56\/",
+                "date_created": "2024-08-15 08:37:00"
+            },
+            {
+                "id": 3058,
+                "name": "AGAL - BAIT AL ARABI - 55AC03307-55",
+                "slug": "agal-bait-al-arabi-55ac03307-55",
+                "type": "simple",
+                "status": "publish",
+                "featured": false,
+                "description": "BEST QUALITY AGAL TO BECOME PART OF PRESTIGE AND CONFORT",
+                "short_description": "",
+                "sku": "",
+                "price": "105",
+                "regular_price": "140",
+                "sale_price": "105",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>140.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;140.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>105.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;105.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "4.8",
+                "rating_count": 5,
+                "categories": [
+                    {
+                        "id": 44,
+                        "name": "AGAL",
+                        "slug": "agal"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3117",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/AGAL-CAT.png",
+                        "name": "AGAL- CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/agal-bait-al-arabi-55ac03307-55\/",
+                "date_created": "2024-08-15 08:37:00"
+            },
+            {
+                "id": 3057,
+                "name": "AGAL- BAIT AL ARABI- 54AC03307-54",
+                "slug": "agal-bait-al-arabi-54ac03307-54",
+                "type": "simple",
+                "status": "publish",
+                "featured": true,
+                "description": "BEST QUALITY AGAL TO BECOME PART OF PRESTIGE AND CONFORT",
+                "short_description": "",
+                "sku": "",
+                "price": "105",
+                "regular_price": "140",
+                "sale_price": "105",
+                "on_sale": true,
+                "price_html": "<del aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>140.00<\/bdi><\/span><\/del> <span class=\"screen-reader-text\">Original price was: &#x62f;.&#x625;140.00.<\/span><ins aria-hidden=\"true\"><span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#x62f;.&#x625;<\/span>105.00<\/bdi><\/span><\/ins><span class=\"screen-reader-text\">Current price is: &#x62f;.&#x625;105.00.<\/span>",
+                "stock_status": "instock",
+                "stock_quantity": null,
+                "manage_stock": false,
+                "average_rating": "0",
+                "rating_count": 0,
+                "categories": [
+                    {
+                        "id": 44,
+                        "name": "AGAL",
+                        "slug": "agal"
+                    }
+                ],
+                "tags": [],
+                "images": [
+                    {
+                        "id": "3117",
+                        "src": "https:\/\/alkhatm.com\/wp-content\/uploads\/2024\/08\/AGAL-CAT.png",
+                        "name": "AGAL- CAT",
+                        "alt": ""
+                    }
+                ],
+                "permalink": "https:\/\/alkhatm.com\/product\/agal-bait-al-arabi-54ac03307-54\/",
+                "date_created": "2024-08-15 08:36:59"
+            }
+        ],
+        "pagination": {
+            "total": 20,
+            "current_page": 1,
+            "per_page": 100,
+            "total_pages": 1
+        }
+    },
+    "timestamp": 1770624687
+}

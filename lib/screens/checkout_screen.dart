@@ -263,6 +263,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           : 'Direct Bank Transfer';
 
       // Create order via WooCommerce API
+      print('🛒 [CHECKOUT] Creating order...');
+      print('   Line items: ${lineItems.length} items');
+      print('   Billing: ${billing['email']}');
+      print('   Payment: $_selectedPaymentMethod');
+      
       final wooService = WooCommerceService();
       final orderResult = await wooService.createOrder(
         lineItems: lineItems,
@@ -271,6 +276,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         paymentMethodTitle: paymentMethodTitle,
         customerNote: _orderNotesController.text.trim(),
       );
+
+      print('📦 [CHECKOUT] Order result: ${orderResult != null ? "SUCCESS" : "FAILED"}');
+      if (orderResult != null) {
+        print('   Order ID: ${orderResult['order_id']}');
+      }
 
       if (orderResult != null && mounted) {
         // Order created successfully - clear cart
@@ -306,7 +316,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Order Total: د.إ ${widget.total.toStringAsFixed(2)}',
+                  'Order Total: د.إ ${(widget.total * 1.05).toStringAsFixed(2)}',  // Total + VAT
                   style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 8),
@@ -333,13 +343,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
       } else if (mounted) {
         // Order creation failed
+        print('❌ [CHECKOUT] Order creation failed - no result returned');
         setState(() => _isProcessing = false);
         
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to place order. Please try again.'),
+            content: Text('Failed to place order. Please check your internet connection and try again.\n\nIf the problem persists, please contact support.'),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 4),
+            duration: Duration(seconds: 6),
           ),
         );
       }
@@ -862,12 +873,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           _buildOrderRow('Subtotal', widget.total),
           const SizedBox(height: 8),
           
+          // VAT (5%)
+          _buildOrderRow('VAT (5%)', widget.total * 0.05),
+          const SizedBox(height: 8),
+          
           // Shipping (Free for now)
           _buildOrderRow('Shipping', 0.0, subtext: 'Free Shipping'),
           
           const Divider(height: 24),
           
-          // Total
+          // Total (Subtotal + VAT + Shipping)
           Row(
             children: [
               const Expanded(
@@ -880,7 +895,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               Text(
-                'د.إ ${widget.total.toStringAsFixed(2)}',
+                'د.إ ${(widget.total * 1.05).toStringAsFixed(2)}',  // Total + 5% VAT
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

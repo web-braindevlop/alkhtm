@@ -380,6 +380,8 @@ class SiteInfo {
   final String version;
   final String theme;
   final String timezone;
+  final String? homepageFeaturedProducts; // 🎯 Product IDs for homepage featured section
+  final SiteAssets? assets; // 🎨 Dynamic assets from WordPress
 
   SiteInfo({
     required this.name,
@@ -391,6 +393,8 @@ class SiteInfo {
     required this.version,
     required this.theme,
     required this.timezone,
+    this.homepageFeaturedProducts,
+    this.assets,
   });
 
   factory SiteInfo.fromJson(Map<String, dynamic> json) {
@@ -404,6 +408,8 @@ class SiteInfo {
       version: json['version'] ?? '',
       theme: json['theme'] ?? '',
       timezone: json['timezone'] ?? '',
+      homepageFeaturedProducts: json['homepage_featured_products']?.toString(),
+      assets: json['assets'] != null ? SiteAssets.fromJson(json['assets']) : null,
     );
   }
 
@@ -418,6 +424,41 @@ class SiteInfo {
       'version': version,
       'theme': theme,
       'timezone': timezone,
+      'homepage_featured_products': homepageFeaturedProducts,
+      'assets': assets?.toJson(),
+    };
+  }
+}
+
+// 🎨 Dynamic assets configuration from WordPress
+class SiteAssets {
+  final String logo;
+  final String logoDark;
+  final Map<String, String> categoryImages;
+  final Map<String, String> countryFlags;
+
+  SiteAssets({
+    required this.logo,
+    required this.logoDark,
+    required this.categoryImages,
+    required this.countryFlags,
+  });
+
+  factory SiteAssets.fromJson(Map<String, dynamic> json) {
+    return SiteAssets(
+      logo: json['logo'] ?? '',
+      logoDark: json['logo_dark'] ?? '',
+      categoryImages: Map<String, String>.from(json['category_images'] ?? {}),
+      countryFlags: Map<String, String>.from(json['country_flags'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'logo': logo,
+      'logo_dark': logoDark,
+      'category_images': categoryImages,
+      'country_flags': countryFlags,
     };
   }
 }

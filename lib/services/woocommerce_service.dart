@@ -17,6 +17,7 @@ class WooProduct {
   final int id;
   final String name;
   final String slug;
+  final String type;
   final String description;
   final String shortDescription;
   final String price;
@@ -29,11 +30,14 @@ class WooProduct {
   final double averageRating;
   final int ratingCount;
   final List<int> relatedIds;
+  final List<ProductVariation> variations;
+  final List<ProductAttribute> attributes;
 
   WooProduct({
     required this.id,
     required this.name,
     required this.slug,
+    this.type = 'simple',
     required this.description,
     required this.shortDescription,
     required this.price,
@@ -46,13 +50,18 @@ class WooProduct {
     required this.averageRating,
     required this.ratingCount,
     this.relatedIds = const [],
+    this.variations = const [],
+    this.attributes = const [],
   });
+
+  bool get isVariable => type == 'variable';
 
   factory WooProduct.fromJson(Map<String, dynamic> json) {
     return WooProduct(
       id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
       name: json['name']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
+      type: json['type']?.toString() ?? 'simple',
       description: json['description']?.toString() ?? '',
       shortDescription: json['short_description']?.toString() ?? '',
       price: json['price']?.toString() ?? '0',
@@ -77,6 +86,14 @@ class WooProduct {
               .where((id) => id > 0)
               .toList() ??
           [],
+      variations: (json['variations'] as List?)
+              ?.map((variation) => ProductVariation.fromJson(variation))
+              .toList() ??
+          [],
+      attributes: (json['attributes'] as List?)
+              ?.map((attr) => ProductAttribute.fromJson(attr))
+              .toList() ??
+          [],
     );
   }
 
@@ -85,6 +102,7 @@ class WooProduct {
       'id': id,
       'name': name,
       'slug': slug,
+      'type': type,
       'description': description,
       'short_description': shortDescription,
       'price': price,
@@ -97,6 +115,8 @@ class WooProduct {
       'average_rating': averageRating.toString(),
       'rating_count': ratingCount,
       'related_ids': relatedIds,
+      'variations': variations.map((v) => v.toJson()).toList(),
+      'attributes': attributes.map((a) => a.toJson()).toList(),
     };
   }
 }
@@ -157,6 +177,171 @@ class ProductCategory {
   }
 }
 
+class ProductVariation {
+  final int id;
+  final String sku;
+  final String price;
+  final String regularPrice;
+  final String salePrice;
+  final bool onSale;
+  final String stockStatus;
+  final int? stockQuantity;
+  final Map<String, String> attributes;
+  final List<ProductImage> images;
+  final bool inStock;
+  final bool isPurchasable;
+
+  ProductVariation({
+    required this.id,
+    required this.sku,
+    required this.price,
+    required this.regularPrice,
+    required this.salePrice,
+    required this.onSale,
+    required this.stockStatus,
+    this.stockQuantity,
+    required this.attributes,
+    required this.images,
+    required this.inStock,
+    required this.isPurchasable,
+  });
+
+  factory ProductVariation.fromJson(Map<String, dynamic> json) {
+    // Convert attributes to Map<String, String>
+    Map<String, String> attrs = {};
+    if (json['attributes'] is Map) {
+      (json['attributes'] as Map).forEach((key, value) {
+        attrs[key.toString()] = value.toString();
+      });
+    }
+
+    return ProductVariation(
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      sku: json['sku']?.toString() ?? '',
+      price: json['price']?.toString() ?? '0',
+      regularPrice: json['regular_price']?.toString() ?? '0',
+      salePrice: json['sale_price']?.toString() ?? '',
+      onSale: json['on_sale'] == true || json['on_sale'] == 'true',
+      stockStatus: json['stock_status']?.toString() ?? '',
+      stockQuantity: json['stock_quantity'] is int 
+          ? json['stock_quantity'] 
+          : int.tryParse(json['stock_quantity']?.toString() ?? ''),
+      attributes: attrs,
+      images: (json['images'] as List?)
+              ?.map((img) => ProductImage.fromJson(img))
+              .toList() ??
+          [],
+      inStock: json['in_stock'] == true || json['in_stock'] == 'true',
+      isPurchasable: json['is_purchasable'] == true || json['is_purchasable'] == 'true',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sku': sku,
+      'price': price,
+      'regular_price': regularPrice,
+      'sale_price': salePrice,
+      'on_sale': onSale,
+      'stock_status': stockStatus,
+      'stock_quantity': stockQuantity,
+      'attributes': attributes,
+      'images': images.map((img) => img.toJson()).toList(),
+      'in_stock': inStock,
+      'is_purchasable': isPurchasable,
+    };
+  }
+
+  String getAttributeValue(String attributeName) {
+    // Try exact match first
+    if (attributes.containsKey(attributeName)) {
+      return attributes[attributeName]!;
+    }
+    
+    // Try case-insensitive match
+    final lowerName = attributeName.toLowerCase();
+    for (var entry in attributes.entries) {
+      if (entry.key.toLowerCase() == lowerName) {
+        return entry.value;
+      }
+    }
+    
+    return '';
+  }
+}
+
+class ProductAttribute {
+  final int id;
+  final String name;
+  final String slug;
+  final List<AttributeOption> options;
+  final bool visible;
+  final bool isColor;
+
+  ProductAttribute({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.options,
+    required this.visible,
+    this.isColor = false,
+  });
+
+  factory ProductAttribute.fromJson(Map<String, dynamic> json) {
+    return ProductAttribute(
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      name: json['name']?.toString() ?? '',
+      slug: json['slug']?.toString() ?? '',
+      options: (json['options'] as List?)
+              ?.map((opt) => AttributeOption.fromJson(opt))
+              .toList() ??
+          [],
+      visible: json['visible'] == true || json['visible'] == 'true',
+      isColor: json['is_color'] == true || json['is_color'] == 'true',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'slug': slug,
+      'options': options.map((opt) => opt.toJson()).toList(),
+      'visible': visible,
+      'is_color': isColor,
+    };
+  }
+}
+
+class AttributeOption {
+  final String slug;
+  final String name;
+  final String? color;
+
+  AttributeOption({
+    required this.slug,
+    required this.name,
+    this.color,
+  });
+
+  factory AttributeOption.fromJson(Map<String, dynamic> json) {
+    return AttributeOption(
+      slug: json['slug']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      color: json['color']?.toString(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'slug': slug,
+      'name': name,
+      'color': color,
+    };
+  }
+}
+
 class WooCategory {
   final int id;
   final String name;
@@ -213,6 +398,7 @@ class WooCommerceService {
     bool? onSale,
     bool? featured,
     String? category,
+    String? orderby,  // 🆕 Added orderby parameter (popularity, rating, date, price, price-desc, title)
   }) async {
     try {
       final params = {
@@ -221,6 +407,7 @@ class WooCommerceService {
         if (onSale != null) 'on_sale': onSale.toString(),
         if (featured != null) 'featured': featured.toString(),
         if (category != null) 'category': category,
+        if (orderby != null) 'orderby': orderby,  // 🆕 Pass orderby to API
       };
 
       final url = _buildBridgeUrl('woo_products', params);
@@ -271,7 +458,7 @@ class WooCommerceService {
     try {
       final params = {
         'per_page': '100',
-        'hide_empty': 'true',
+        'hide_empty': 'false',  // ✅ Show all categories including empty ones
       };
       
       final url = _buildBridgeUrl('woo_categories', params);
@@ -296,13 +483,13 @@ class WooCommerceService {
   }
 
   // Get featured products
-  Future<List<WooProduct>> getFeaturedProducts({int page = 1, int perPage = 10}) async {
+  Future<List<WooProduct>> getFeaturedProducts({int page = 1, int perPage = 100}) async {
     return getProducts(featured: true, page: page, perPage: perPage);
   }
 
   // Get sale products
-  Future<List<WooProduct>> getSaleProducts({int page = 1, int perPage = 10}) async {
-    return getProducts(onSale: true, page: page, perPage: perPage);
+  Future<List<WooProduct>> getSaleProducts({int page = 1, int perPage = 10, String? orderby}) async {
+    return getProducts(onSale: true, page: page, perPage: perPage, orderby: orderby);
   }
 
   // Get products by category
@@ -390,22 +577,36 @@ class WooCommerceService {
         'customer_note': customerNote ?? '',
       };
 
+      final url = _buildBridgeUrl('woo_create_order', {});
+      print('📡 [API] Posting order to: $url');
+      print('📦 [API] Order data: ${jsonEncode(orderData).substring(0, 200)}...');
+
       final response = await http.post(
-        Uri.parse(_buildBridgeUrl('woo_create_order', {})),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(orderData),
       ).timeout(ApiConfig.timeout);
 
+      print('📡 [API] Response status: ${response.statusCode}');
+      print('📡 [API] Response body: ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
+          print('✅ [API] Order created successfully!');
           return jsonResponse['data'];
+        } else {
+          print('❌ [API] Order creation failed: ${jsonResponse['message']}');
         }
+      } else {
+        print('❌ [API] HTTP error: ${response.statusCode}');
+        print('   Body: ${response.body}');
       }
       return null;
     } catch (e) {
+      print('❌ [API] Exception creating order: $e');
       return null;
     }
   }

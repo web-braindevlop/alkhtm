@@ -39,12 +39,25 @@ class _ShopScreenState extends State<ShopScreen> {
     });
 
     try {
-      final products = await _wooService.getProducts(perPage: 20);
+      print('📦 [SHOP] Loading all products from server...');
+      final products = await _wooService.getProducts(perPage: 100); // Increased to load all products
+      print('✅ [SHOP] Loaded ${products.length} products');
+      
+      // Log variable products
+      final variableProducts = products.where((p) => p.type == 'variable').toList();
+      if (variableProducts.isNotEmpty) {
+        print('🔄 [SHOP] Found ${variableProducts.length} variable products');
+        for (var p in variableProducts) {
+          print('   - ${p.name} (ID: ${p.id})');
+        }
+      }
+      
       setState(() {
         _products = products;
         _isLoading = false;
       });
     } catch (e) {
+      print('❌ [SHOP] Error loading products: $e');
       setState(() {
         _errorMessage = 'Error loading products: $e';
         _isLoading = false;
@@ -239,12 +252,27 @@ class _ShopScreenState extends State<ShopScreen> {
 
   // Handle refresh - respects search mode
   Future<void> _handleRefresh() async {
+    print('🔄 [SHOP] Refreshing products...');
+    
     if (_isSearchMode && _currentSearchQuery.isNotEmpty) {
       // Re-run the search
       await _performSearch(_currentSearchQuery);
     } else {
-      // Load all products
+      // Load all products (this will fetch latest from server)
       await _loadProducts();
     }
+    
+    // Show success message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Products refreshed!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+    
+    print('✅ [SHOP] ${_products.length} products loaded from server');
   }
 }

@@ -46,6 +46,24 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   List<dynamic> _saleProducts = [];
   bool _isLoading = true;
   
+  // 🎨 Helper methods for dynamic assets
+  String _getLogoDark() => _siteInfo?.assets?.logoDark ?? 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png';
+  String _getLogo() => _siteInfo?.assets?.logo ?? 'https://alkhatm.com/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png';
+  
+  String _getCountryFlag(String country) {
+    // Try WordPress first
+    if (_siteInfo?.assets?.countryFlags[country] != null) {
+      return _siteInfo!.assets!.countryFlags[country]!;
+    }
+    // Fallback URLs (verified to exist on server)
+    final fallbackFlags = {
+      'UAE': 'https://alkhatm.com/wp-content/uploads/2024/05/EMARATI.png',
+      'KUWAIT': 'https://alkhatm.com/wp-content/uploads/2024/05/KUWAITI.png',
+      'SAUDI': 'https://alkhatm.com/wp-content/uploads/2024/05/SAUDI-ARABIA.png',
+    };
+    return fallbackFlags[country] ?? '';
+  }
+  
   // Product showcase autoplay
   late PageController _showcasePageController;
   Timer? _showcaseTimer;
@@ -197,6 +215,20 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         return;
       }
       
+      // ⏰ CHECK CACHE EXPIRATION (24 hours)
+      final cacheTimestamp = prefs.getInt('cache_timestamp') ?? 0;
+      final cacheAge = DateTime.now().millisecondsSinceEpoch - cacheTimestamp;
+      const maxCacheAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      
+      if (cacheTimestamp > 0 && cacheAge > maxCacheAge) {
+        print('⏰ [CACHE] Cache expired (${(cacheAge / (60 * 60 * 1000)).toStringAsFixed(1)} hours old), clearing...');
+        await _clearCache();
+        setState(() {
+          _isLoading = true;
+        });
+        return;
+      }
+      
       // Load all cached data
       final cachedHomepage = prefs.getString('cached_homepage');
       final cachedCategories = prefs.getString('cached_categories');
@@ -300,8 +332,8 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         _wpService.getSiteInfo(),           // 0
         _wpService.getPage(214),            // 1 - Homepage
         _wooService.getCategories(),        // 2
-        _wooService.getFeaturedProducts(perPage: 8),  // 3
-        _wooService.getSaleProducts(perPage: 8),      // 4
+        _wooService.getFeaturedProducts(perPage: 50),  // 3 - WooCommerce Featured Products (visibility="featured")
+        _wooService.getSaleProducts(perPage: 4, orderby: 'popularity'),  // 4 - Sale Products: [products limit="4" orderby="popularity" on_sale="true"]
         _wpService.getPage(807),            // 5 - Contact page
       ]);
       
@@ -355,12 +387,15 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
 
         // Categories
         _categories = categories;
+        print('📦 [CATEGORIES] Loaded ${categories.length} categories');
 
         // Featured products
         _featuredProducts = featuredProducts;
+        print('⭐ [FEATURED] Loaded ${featuredProducts.length} featured products');
 
         // Sale products
         _saleProducts = saleProducts;
+        print('🏷️ [SALE] Loaded ${saleProducts.length} sale products');
 
         _isLoading = false; // Ensure no loading state
       });
@@ -396,9 +431,10 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       
-      // Save cache version
+      // Save cache version and timestamp
       const currentCacheVersion = 2;
       await prefs.setInt('cache_version', currentCacheVersion);
+      await prefs.setInt('cache_timestamp', DateTime.now().millisecondsSinceEpoch);
       
       // Cache homepage
       final homepage = homepageResponse as ApiResponse<Post>;
@@ -479,6 +515,52 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     }
   }
 
+  // 🗑️ Clear all cached data
+  Future<void> _clearCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('cached_homepage');
+      await prefs.remove('cached_categories');
+      await prefs.remove('cached_featured_products');
+      await prefs.remove('cached_sale_products');
+      await prefs.remove('cached_site_info');
+      await prefs.remove('cached_contact_info');
+      await prefs.remove('cache_timestamp');
+      print('🗑️ [CACHE] All cached data cleared');
+    } catch (e) {
+      print('⚠️ [CACHE] Error clearing cache: $e');
+    }
+  }
+
+  // 🔄 Manual Refresh - Clear cache and reload fresh data
+  Future<void> _refreshContent() async {
+    print('🔄 [REFRESH] Manual refresh triggered - clearing cache...');
+    
+    // Show loading indicator
+    setState(() {
+      _isLoading = true;
+    });
+    
+    // Clear all cached data
+    await _clearCache();
+    
+    // Load fresh data from server
+    await _loadHomePageContent();
+    
+    // Show success message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Content refreshed successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    
+    print('✅ [REFRESH] Content refreshed with latest data from server');
+  }
+
   Future<void> _loadHomePageContent_OLD() async {
     setState(() {
       _isLoading = true;
@@ -494,7 +576,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         _wpService.getSiteInfo(),           // 0
         _wpService.getPage(214),            // 1 - Homepage
         _wooService.getCategories(),        // 2
-        _wooService.getFeaturedProducts(perPage: 8),  // 3
+        _wooService.getFeaturedProducts(perPage: 50),  // 3 - WooCommerce Featured Products
         _wooService.getSaleProducts(perPage: 8),      // 4
         _wpService.getPage(807),            // 5 - Contact page
       ]);
@@ -585,7 +667,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
               children: [
                 Flexible(
                   child: CachedNetworkImage(
-                    imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
+                    imageUrl: _getLogoDark(),
                     height: leftLogoHeight,
                     fit: BoxFit.contain,
                     placeholder: (context, url) => SizedBox(
@@ -604,7 +686,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                 const SizedBox(width: 0),
                 Flexible(
                   child: CachedNetworkImage(
-                    imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png',
+                    imageUrl: _getLogo(),
                     height: rightLogoHeight,
                     fit: BoxFit.contain,
                     placeholder: (context, url) => SizedBox(
@@ -635,7 +717,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
         },
       ),
       body: RefreshIndicator(
-        onRefresh: _loadHomePageContent,
+        onRefresh: _refreshContent,
         child: _buildBody(),
       ),
     );
@@ -655,7 +737,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CachedNetworkImage(
-                  imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/05/Untitled_design__1_-removebg-preview.png',
+                  imageUrl: _getLogoDark(),
                   height: 40,
                   fit: BoxFit.contain,
                   placeholder: (context, url) => const SizedBox(
@@ -672,7 +754,7 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
                 ),
                 const SizedBox(height: 8),
                 CachedNetworkImage(
-                  imageUrl: 'https://alkhatm.com/wp-content/uploads/2024/07/AL_KHATM_LOGO-removebg-preview-1.png',
+                  imageUrl: _getLogo(),
                   height: 40,
                   fit: BoxFit.contain,
                   placeholder: (context, url) => const SizedBox(
@@ -1042,19 +1124,19 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
   }
 
   Widget _buildCountryFlagsSection() {
-    // Country flag images from WordPress
+    // 🎨 Country flag images from WordPress (dynamic)
     final List<Map<String, String>> countryFlags = [
       {
         'name': 'Emirates',
-        'image': 'https://alkhatm.com/wp-content/uploads/2024/05/EMARATI.png',
+        'image': _getCountryFlag('UAE'),
       },
       {
         'name': 'Kuwait',
-        'image': 'https://alkhatm.com/wp-content/uploads/2024/05/KUWAITI.png',
+        'image': _getCountryFlag('KUWAIT'),
       },
       {
         'name': 'Saudi Arabia',
-        'image': 'https://alkhatm.com/wp-content/uploads/2024/05/SAUDI-ARABIA.png',
+        'image': _getCountryFlag('SAUDI'),
       },
     ];
 
@@ -1134,25 +1216,47 @@ class _DynamicHomeScreenState extends State<DynamicHomeScreen> {
     // Show only first 6 categories (2 rows x 3 columns)
     final displayCategories = _categories.take(6).toList();
     
-    // Manual mapping for category images (since WooCommerce categories don't have images)
+    // 🎨 Dynamic category images from WordPress site_info
     String? _getCategoryImage(String categoryName) {
-      final baseUrl = 'https://alkhatm.com/wp-content/uploads/2024/08';
-      final categoryImages = {
-        'SANDALS': '$baseUrl/SANDALS-CAT.png',
-        'FRAGRANCES': '$baseUrl/FRAGRANCES-CAT.png',
-        'AGAL': '$baseUrl/AGAL-CAT.png',
-        'SHAWL': '$baseUrl/SHAWL-CAT.png',
-        'BUKHOOR': '$baseUrl/BUKHOOR-CAT.png',
-        'HUZAR': '$baseUrl/HUZAR-CAT.png',
+      // Try to get from WordPress first
+      if (_siteInfo?.assets?.categoryImages != null) {
+        // Try exact match first
+        if (_siteInfo!.assets!.categoryImages.containsKey(categoryName)) {
+          final imageUrl = _siteInfo!.assets!.categoryImages[categoryName];
+          print('🖼️ [CATEGORY] $categoryName -> Image: $imageUrl (from WordPress)');
+          return imageUrl;
+        }
+        
+        // Try case-insensitive match
+        final entry = _siteInfo!.assets!.categoryImages.entries.firstWhere(
+          (e) => e.key.toUpperCase() == categoryName.toUpperCase(),
+          orElse: () => const MapEntry('', ''),
+        );
+        if (entry.value.isNotEmpty) {
+          print('🖼️ [CATEGORY] $categoryName -> Image: ${entry.value} (from WordPress)');
+          return entry.value;
+        }
+      }
+      
+      // Fallback to hardcoded URLs if not in WordPress
+      final fallbackImages = {
+        'SANDALS': 'https://alkhatm.com/wp-content/uploads/2024/05/sandals-1-2.png',
+        'AGAL': 'https://alkhatm.com/wp-content/uploads/2024/08/AGAL-CAT.png',
+        'SHAWL': 'https://alkhatm.com/wp-content/uploads/2026/02/DSC_9610-scaled.jpg',  // ✅ Using actual SHAWL product image
+        'HAMDANIYA': 'https://alkhatm.com/wp-content/uploads/2026/01/Hamdaniyatelal_1024x1024@2x.jpg',
+        'FRAGRANCES': 'https://alkhatm.com/wp-content/uploads/2024/08/FRAGRANCES-CAT.png',
+        'BUKHOOR': 'https://alkhatm.com/wp-content/uploads/2024/08/BUKHOOR-CAT.png',
+        'HUZAR': 'https://alkhatm.com/wp-content/uploads/2024/08/HUZAR-CAT.png',
       };
       
-      // Match category name (case insensitive)
-      final key = categoryImages.keys.firstWhere(
+      final key = fallbackImages.keys.firstWhere(
         (k) => categoryName.toUpperCase().contains(k),
         orElse: () => '',
       );
       
-      return key.isNotEmpty ? categoryImages[key] : null;
+      final imageUrl = key.isNotEmpty ? fallbackImages[key] : null;
+      print('🖼️ [CATEGORY] $categoryName -> Image: ${imageUrl ?? "NOT FOUND"} (fallback)');
+      return imageUrl;
     }
     
     final screenWidth = MediaQuery.of(context).size.width;

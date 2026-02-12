@@ -48,14 +48,14 @@ class _FeaturedProductsScreenState extends State<FeaturedProductsScreen> {
     try {
       final products = await _wooService.getFeaturedProducts(
         page: 1,
-        perPage: 20,
+        perPage: 100,
       );
 
       setState(() {
         _products = products;
         _isLoading = false;
         _currentPage = 1;
-        _hasMore = products.length >= 20;
+        _hasMore = products.length >= 100;
       });
     } catch (e) {
       setState(() => _isLoading = false);
@@ -76,7 +76,7 @@ class _FeaturedProductsScreenState extends State<FeaturedProductsScreen> {
       final nextPage = _currentPage + 1;
       final products = await _wooService.getFeaturedProducts(
         page: nextPage,
-        perPage: 20,
+        perPage: 100,
       );
 
       setState(() {
